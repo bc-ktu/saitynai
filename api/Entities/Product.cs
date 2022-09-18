@@ -16,7 +16,7 @@ namespace api.Models
         private int quantity = 1;
         private bool isNew = false;
 
-        public Array<> MyProperty { get; set; }
+        //public Array<> MyProperty { get; set; }
 
         // add author, isArchived
 
