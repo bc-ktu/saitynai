@@ -25,7 +25,7 @@ Užsakymas <- Produktas <- Komentaras
 
 **Sistemos architektūra:**
 <br />
-![Untitled Diagram (1) drawio](https://user-images.githubusercontent.com/113304150/190958590-7b68b32a-4362-4724-bf8a-cce9dc57d93a.png)
+![Untitled Diagram (1) drawio (1)](https://user-images.githubusercontent.com/113304150/190967359-bc15b160-b514-4b72-85bf-289c9443ed93.png)
 <br />
 
 **Pasirinktos technologijos:**
