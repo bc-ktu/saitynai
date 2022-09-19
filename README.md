@@ -3,7 +3,7 @@ T120B165 Saityno taikomųjų programų projektavimas - projektas
 
 **Projektas**: Privati svetainė “Knyga” 
 
-**Sistemos paskirtis**: padėti knygrišiui lengviau valdyti užsakymus, susisiekti su klientais. 
+**Sistemos paskirtis**: padėti knygrišiui skaitmenizuotai valdyti užsakymus, gaminamus ir parduodamus produktus. 
 
 **API metodai**: 
 - Kurti/skaityti/keisti/trinti užsakymą ir peržiūrėti visus užsakymus 
