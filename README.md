@@ -14,7 +14,7 @@ Užsakymas <- Produktas <- Komentaras
 
 **Rolės**: svečias (neprisijungęs naudotojas), narys, administratorius
 
-**Funkciniai reikalavimai: **
+**Funkciniai reikalavimai:**
 - Neprisijungę vartotojai gali peržiūrėti produktų puslapį, kiekvieno produkto puslapį bei perskaityti komentarus.
 - Neprisijungę vartotojai gali teikti užklausą prisijungimui į sistemą.
 - Nariai gali kurti užsakymą, į jį pridėti produktus, kurti naujus produktus (juos turi patvirtinti administratorius).
