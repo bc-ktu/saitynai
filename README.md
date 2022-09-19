@@ -1,20 +1,20 @@
 # saitynai
 T120B165 Saityno taikomųjų programų projektavimas - projektas
 
-Projektas: Privati svetainė “Knyga” 
+**Projektas**: Privati svetainė “Knyga” 
 
-Sistemos paskirtis: padėti knygrišiui lengviau valdyti užsakymus, susisiekti su klientais. 
+**Sistemos paskirtis**: padėti knygrišiui lengviau valdyti užsakymus, susisiekti su klientais. 
 
-API metodai: 
+**API metodai**: 
 - Kurti/skaityti/keisti/trinti užsakymą ir peržiūrėti visus užsakymus 
 - Kurti/keisti/trinti/peržiūrėti produktą ir peržiūrėti visus produktus 
 - Kurti/keisti/trinti komentarą ir peržiūrėti visus komentarus 
 
 Užsakymas <- Produktas <- Komentaras 
 
-Rolės: svečias (neprisijungęs naudotojas), narys, administratorius
+**Rolės**: svečias (neprisijungęs naudotojas), narys, administratorius
 
-Funkciniai reikalavimai: 
+**Funkciniai reikalavimai: **
 - Neprisijungę vartotojai gali peržiūrėti produktų puslapį, kiekvieno produkto puslapį bei perskaityti komentarus.
 - Neprisijungę vartotojai gali teikti užklausą prisijungimui į sistemą.
 - Nariai gali kurti užsakymą, į jį pridėti produktus, kurti naujus produktus (juos turi patvirtinti administratorius).
@@ -23,11 +23,11 @@ Funkciniai reikalavimai:
 - Administratorius patvirtina užsakymą, jis gali keisti užsakymo būseną.
 - Svetainėje nėra vykdomi apmokėjimai. 
 
-Sistemos architektūra:
+**Sistemos architektūra:**
 <br />
 ![Untitled Diagram (1) drawio](https://user-images.githubusercontent.com/113304150/190958590-7b68b32a-4362-4724-bf8a-cce9dc57d93a.png)
 <br />
 
-Pasirinktos technologijos:
+**Pasirinktos technologijos:**
 - Frontend dalis: React
 - Backend dalis: .NET 6 + SQL Server
