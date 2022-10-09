@@ -14,13 +14,11 @@ namespace api.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService service;
-      //  private readonly IProductService service;
         private readonly IMapper mapper;
 
         public OrderController(IOrderService service, IMapper mapper)
         {
             this.service = service;
-            //this.service = service;
             this.mapper = mapper;
         }
 
@@ -92,6 +90,11 @@ namespace api.Controllers
             var order = await service.GetOrder(id);
             if (order == null)
                 return NotFound($"Užsakymas (Id={id}) nerastas.");
+
+            if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
+            {
+                return BadRequest($"Negalima pašalinti užsakymo dėl statuso. Statusas - {order.Status}");
+            }
 
             try
             {

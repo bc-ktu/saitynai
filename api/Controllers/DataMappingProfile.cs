@@ -13,6 +13,7 @@ namespace api.Controllers
             CreateMap<Product, ProductDto>();
             CreateMap<ProductDto, Product>();
             CreateMap<UpdateProductQuantityDto, ProductDto>();
+            CreateMap<CreateProductDto, Product>();
 
             CreateMap<Comment, CommentDto>();
             CreateMap<CommentDto, Comment>();

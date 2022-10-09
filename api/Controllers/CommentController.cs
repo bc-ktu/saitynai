@@ -12,6 +12,8 @@ namespace api.Controllers
 {
     [ApiController]
     [Route("api/Products/{productId}/[controller]s")]
+   // [Route("api/Order/{orderId}/Products/{productId}/[controller]s")]
+
     public class CommentController : ControllerBase
     {
         private readonly ICommentService service;
@@ -27,7 +29,8 @@ namespace api.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<List<CommentDto>>> Get(int productId)
+        [Route("api/Products/{productId}/[controller]s")]
+        public async Task<ActionResult<List<CommentDto>>> Get(int productId, int orderId = -1)
         {
             var product = await productService.GetProduct(productId);
             if (product == null)
@@ -43,7 +46,7 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
+        [Route("api/Products/{productId}/[controller]s/{id}")]
         public async Task<ActionResult<CommentDto>> GetComment(int productId, int id)
         {
             var product = await productService.GetProduct(productId);
@@ -59,7 +62,7 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("api/Products/{productId}/[controller]s/{id}")]
         public async Task<ActionResult<CommentDto>> UpdateComment(int productId, int id, UpdateCommentDto updatedComment)
         {
             var product = await productService.GetProduct(productId);
@@ -86,6 +89,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
+        [Route("api/Products/{productId}/[controller]s")]
         public async Task<IActionResult> CreateComment(int productId, CreateCommentDto newComment)
         {
             var product = await productService.GetProduct(productId);
@@ -107,7 +111,7 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("api/Products/{productId}/[controller]s/{id}")]
         public async Task<IActionResult> DeleteComment(int productId, int id)
         {
             var product = await productService.GetProduct(productId);
@@ -128,26 +132,26 @@ namespace api.Controllers
             return Ok(); //TODO: check code
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteComments(int productId)
-        {
-            var product = await productService.GetProduct(productId);
-            if (product == null)
-                return NotFound($"Produktas (Id={productId}) nerastas.");
+        //[HttpDelete]
+        //public async Task<IActionResult> DeleteComments(int productId)
+        //{
+        //    var product = await productService.GetProduct(productId);
+        //    if (product == null)
+        //        return NotFound($"Produktas (Id={productId}) nerastas.");
 
-            var comments = await service.GetAllComments(productId);
-            if (comments == null)
-                return NotFound($"Produktas (Id={productId}) neturi komentarų.");
-            try
-            {
-                await service.DeleteComments(comments);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Nepavyko pašalinti komentarų. Klaida: {ex.Message}");
-            }
-            return Ok(); //TODO: check code
-        }
+        //    var comments = await service.GetAllComments(productId);
+        //    if (comments == null)
+        //        return NotFound($"Produktas (Id={productId}) neturi komentarų.");
+        //    try
+        //    {
+        //        await service.DeleteComments(comments);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest($"Nepavyko pašalinti komentarų. Klaida: {ex.Message}");
+        //    }
+        //    return Ok(); //TODO: check code
+        //}
 
         //[HttpGet(Name = "Products")]
         //public async Task<ActionResult<Comment>> GetComments()

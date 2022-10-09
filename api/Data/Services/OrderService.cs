@@ -23,7 +23,6 @@ namespace api.Data.Services
 
         public async Task<List<Order>> GetAllOrders()
         {
-            //return await context.Orders.Include(p => p.Products).ToListAsync();
             return await context.Orders.ToListAsync();
         }
 
@@ -40,15 +39,22 @@ namespace api.Data.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task DeleteOrder(Order Order)
+        public async Task DeleteOrder(Order order)
         {
-            context.Orders.Remove(Order);
+            var getOrder = await context.Orders.Include(p => p.Products).FirstOrDefaultAsync(i => i.Id == order.Id);
+            if (getOrder.Products.Count != 0)
+            {
+                foreach (var p in getOrder.Products)
+                    p.OrderId = null;
+            }
+            
+            context.Orders.Remove(order);
             await context.SaveChangesAsync();
         }
 
-        public async Task UpdateOrder(int id, Order Order)
+        public async Task UpdateOrder(int id, Order order)
         {
-            context.Orders.Update(Order);
+            context.Orders.Update(order);
             await context.SaveChangesAsync();
         }
     }

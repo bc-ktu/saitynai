@@ -1,4 +1,6 @@
-using api.Data;
+﻿using api.Data;
+using api.Data.Entities;
+using api.Data.Services;
 using api.DTOs;
 using api.Entities;
 using api.Models;
@@ -11,45 +13,21 @@ using System.Net;
 namespace api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]s")]
     public class ProductController : ControllerBase
     {
-        //private readonly StoreContext context; 
         private readonly IProductService service;
+        private readonly IOrderService orderService;
         private readonly IMapper mapper;
-       /* private Mapper mapp;*/
 
-        //private MapperConfiguration configProductToDto = new MapperConfiguration(ctg =>
-        //{
-        //    ctg.AddProfile<ProductDataMappingProfile>();
-        //    //ctg.AllowNullCollections = true;
-        //    ctg.CreateMap<Product, ProductDto>();//.Include<Comment, CommentDto>();
-        //});
-        //private MapperConfiguration configDtoToProduct = new MapperConfiguration (ctg => ctg.CreateMap<ProductDto, Product>());
-
-        //public ProductController(StoreContext context)
-        //{
-        //    this.context = context;
-        //}
-
-        public ProductController(IProductService service, IMapper mapper)
+        public ProductController(IProductService service, IOrderService orderService, IMapper mapper)
         {
             this.service = service;
+            this.orderService = orderService;
             this.mapper = mapper;
-            /*mapp = InitializeAutomapper();*/
         }
-
-        /*static Mapper InitializeAutomapper()
-        {
-            var config = new MapperConfiguration(cfg => {
-                cfg.CreateMap<Product, ProductDto>();
-            });
-            var mapper = new Mapper(config);
-            return mapper;
-        }*/
-
+        
         [HttpGet]
-       // [Route("api/Order/{OrderId}/Products")]
+        [Route("api/[controller]s")]
         public async Task<ActionResult<List<ProductDto>>> Get()
         {
             var products = await service.GetAllProducts();
@@ -58,8 +36,20 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
-       // [Route("api/Order/{OrderId}/Products/{id}")]
+        [Route("api/Orders/{orderId}/[controller]s")]
+        public async Task<ActionResult<List<ProductDto>>> Get(int orderId)
+        {
+            var order = await orderService.GetOrder(orderId);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={orderId}) nerastas.");
+
+            var products = await service.GetAllProducts(orderId);
+            List<ProductDto> result = mapper.Map<List<Product>, List<ProductDto>>(products);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("api/[controller]s/{id}")]
         public async Task<ActionResult<ProductDto>> GetProduct(int id)
         {
             var product = await service.GetProduct(id);
@@ -69,9 +59,23 @@ namespace api.Controllers
             return Ok(productDto);
         }
 
+        [HttpGet]
+        [Route("api/Orders/{orderId}/[controller]s/{id}")]
+        public async Task<ActionResult<ProductDto>> GetProduct(int id, int orderId)
+        {
+            var order = await orderService.GetOrder(orderId);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={orderId}) nerastas.");
+
+            var product = await service.GetProduct(id, orderId);
+            if (product == null)
+                return NotFound($"Produktas su Id {id} nerastas.");
+            var productDto = mapper.Map<Product, ProductDto>(product);
+            return Ok(productDto);
+        }
+
         [HttpPut]
-        [Route("{id}")]
-        // [Route("api/Order/{OrderId}/Products/{id}")]
+        [Route("api/[controller]s/{id}")]
         public async Task<ActionResult<ProductDto>> UpdateProduct(int id, ProductDto updatedProduct)
         {           
             var product = await service.GetProduct(id);
@@ -90,10 +94,69 @@ namespace api.Controllers
             return StatusCode(204);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateProduct(ProductDto newProduct)
+        [HttpPut]
+        [Route("api/Orders/{orderId}/[controller]s/{id}")]
+        public async Task<ActionResult<ProductDto>> UpdateProduct(int id, ProductDto updatedProduct, int orderId)
         {
-            var mapDtoToProduct = mapper.Map<ProductDto, Product>(newProduct);
+            var order = await orderService.GetOrder(orderId);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={orderId}) nerastas.");
+
+            var product = await service.GetProduct(id);
+            if (product == null)
+                return NotFound($"Produktas su Id {id} nerastas.");
+
+            if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
+            {
+                return BadRequest($"Negalima atnaujinti produkto prie užsakymo dėl statuso. Statusas - {order.Status}");
+            }
+
+            var productFromDto = mapper.Map<ProductDto, Product>(updatedProduct, product);
+            productFromDto.OrderId = orderId;
+            try
+            {
+                await service.UpdateProduct(id, productFromDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Nepavyko atnaujinti produkto. Klaida: {ex.Message}");
+            }
+            return StatusCode(204);
+        }
+
+        [HttpPost]
+        [Route("api/[controller]s")]
+        public async Task<IActionResult> CreateProduct(CreateProductDto newProduct)
+        {
+            var mapDtoToProduct = mapper.Map<CreateProductDto, Product>(newProduct);
+            mapDtoToProduct.isNew = true;
+            try
+            {
+                await service.CreateProduct(mapDtoToProduct);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Nepavyko sukurti produkto. Klaida: {ex.Message}");
+            }
+            return StatusCode(201);
+        }
+
+        [HttpPost]
+        [Route("api/Orders/{orderId}/[controller]s")]
+        public async Task<IActionResult> CreateProduct(CreateProductDto newProduct, int orderId)
+        {
+            var order = await orderService.GetOrder(orderId);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={orderId}) nerastas.");
+
+            if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
+            {
+                return BadRequest($"Negalima sukurti produkto prie užsakymo dėl statuso. Statusas - {order.Status}");
+            }
+
+            var mapDtoToProduct = mapper.Map<CreateProductDto, Product>(newProduct);
+            mapDtoToProduct.OrderId = orderId;
+            mapDtoToProduct.isNew = true;
             try
             {
                 await service.CreateProduct(mapDtoToProduct);
@@ -106,138 +169,109 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("api/[controller]s/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var product = await service.GetProduct(id);
             if (product == null)
                 return NotFound($"Produktas su Id {id} nerastas.");
+
+            if (product.OrderId != null)
+                return NotFound($"Produkto (Id={id}) negalima ištrinti, pašalinkite produktą iš užsakymo (Id={product.OrderId}).");
+
             try
             {
                 await service.DeleteProduct(product);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko pa�alinti produkto. Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko pašalinti produkto. Klaida: {ex.Message}");
             }
             return Ok(); //TODO: check code
         }
 
-        //[HttpGet(Name = "GetAll")]
-        //public async Task<ActionResult<List<Product>>> GetProducts()
-        //{
-        //    var products = await context.Products.ToListAsync();
-        //    return await context.Products
-        //        .Include(c => c.Comments)
-        //        .ToListAsync();
-        //}
+        [HttpDelete]
+        [Route("api/Orders/{orderId}/[controller]s/{id}")]
+        public async Task<IActionResult> DeleteProduct(int id, int orderId)
+        {
+            var order = await orderService.GetOrder(orderId);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={orderId}) nerastas.");
 
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Product>> GetProduct(int id)
-        //{
-        //}
+            var product = await service.GetProduct(id);
+            if (product == null)
+                return NotFound($"Produktas su Id {id} nerastas.");
 
-        //[HttpDelete("{id}")]
-        //public async Task<ActionResult> DeleteProduct(int id)
-        //{
-        //    //remove related comments
-        //    var comments = await context.Comments
-        //        .Where(p => p.ProductId == id)
-        //        .ToListAsync();
+            if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
+            {
+                return BadRequest($"Negalima ištrinti produkto dėl statuso. Statusas - {order.Status}");
+            }
 
-        //    if (comments != null)
-        //        context.Comments.RemoveRange(comments);
+            try
+            {
+                await service.DeleteProduct(product);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Nepavyko pašalinti produkto. Klaida: {ex.Message}");
+            }
+            return Ok(); //TODO: check code
+        }
 
-        //    //remove the product
-        //    var product = await context.Products
-        //        .Where(p => p.Id == id)
-        //        .FirstOrDefaultAsync();
+        [HttpPatch]
+        [Route("api/Orders/{orderId}/[controller]s/{id}")]
+        public async Task<IActionResult> RemoveProductFromOrder(int id, int orderId)
+        {
+            var order = await orderService.GetOrder(orderId);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={orderId}) nerastas.");
 
-        //    if (product == null) 
-        //        return NotFound();
+            var product = await service.GetProduct(id);
+            if (product == null)
+                return NotFound($"Produktas su Id {id} nerastas.");
 
-        //    context.Products.Remove(product);
+            if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
+            {
+                return BadRequest($"Negalima pašalinti produkto iš užsakymo dėl statuso. Statusas - {order.Status}");
+            }
 
-        //    var result = await context.SaveChangesAsync() > 0;
+            try
+            {
+                await service.RemoveProductFromOrder(product.Id);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Nepavyko produkto pašalinti produkto iš užsakymo. Klaida: {ex.Message}");
+            }
+            return Ok(); //TODO: check code
+        }
 
-        //    if(result)
-        //        return Ok();
+        [HttpPatch]
+        [Route("api/Orders/{orderId}/[controller]s/{id}")]
+        public async Task<IActionResult> AddExistingProductToOrder(int id, int orderId)
+        {
+            var order = await orderService.GetOrder(orderId);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={orderId}) nerastas.");
 
-        //    return BadRequest(error: "Problem with deleting the product" );
-        //}
+            var product = await service.GetProduct(id);
+            if (product == null)
+                return NotFound($"Produktas su Id {id} nerastas.");
 
-        //[HttpPost]
-        //public async Task<ActionResult> CreateProduct(Product newProduct)
-        //{
-        //    var existingProduct = await context.Products.FindAsync(newProduct.Id);
-        //    if(existingProduct != null)
-        //        return BadRequest(error: "Such product exists");
-
-        //    /*var product = new Product {
-
-        //    };*/
-
-        //    context.Products.Add(newProduct);
-        //    var result = await context.SaveChangesAsync() > 0;
-        //    if(result)
-        //        return Ok();
-
-        //    return BadRequest(error: "Problem with creating the product" );
-        //}
-
-        //[HttpPut] //dto
-        //public async Task<ActionResult<List<Product>>> UpdateProduct(int id, Product updatedProduct)
-        //{
-        //    if (id != updatedProduct.Id)
-        //        return BadRequest();
-
-        //    var existingProduct = await context.Products.FindAsync(updatedProduct.Id);
-        //    if(existingProduct == null)
-        //        return NotFound();
-
-        //    existingProduct.Title = updatedProduct.Title;
-        //    existingProduct.Description = updatedProduct.Description;
-        //    existingProduct.IsNew = updatedProduct.IsNew;
-        //    existingProduct.Type = updatedProduct.Type;
-        //    existingProduct.Price = updatedProduct.Price;
-        //    existingProduct.Quantity = updatedProduct.Quantity;
-
-        //    var result = await context.SaveChangesAsync() > 0;
-        //    if(result)
-        //        return await context.Products
-        //        .Where(c => c.Id == id)
-        //        .Include(c => c.Comments)
-        //        .ToListAsync();
-
-        //    return BadRequest(error: "Problem with updating the product" );
-
-        //    /*var newProduct = new Product {
-        //        Title = existingProduct.Title,
-        //        Description = existingProduct.Description,
-        //        IsNew = existingProduct
-        //    };*/
-        //}
-
-        //private ProductDto MapProductToDto(Product product)
-        //{
-        //    return new ProductDto
-        //    {
-        //        Title = product.Title,
-        //        Price = (decimal)product.Price,
-        //        Type = product.Type,
-        //        Description = product.Description,
-        //        Quantity = product.Quantity,
-        //        IsNew = product.isNew,
-        //        Comments = product.Comments.Select(item => new Comment
-        //        {
-        //            Id = item.Id,
-        //            DateCreated = item.DateCreated,
-        //            Title = item.Title,
-        //            Text = item.Text,
-        //            isDeleted = item.isDeleted,
-        //            DateEditted = item.DateEditted
-        //        }).ToList()
-        //    };
-        //}
+            if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
+            {
+                return BadRequest($"Negalima pridėti produkto iš užsakymo dėl statuso. Statusas - {order.Status}");
+            }
+            product.OrderId = orderId;
+            try
+            {
+                await service.AddExistingProductToOrder(product);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Nepavyko produkto . Klaida: {ex.Message}");
+            }
+            return Ok(); //TODO: check code
+        }
     }
 }
