@@ -1,3 +1,7 @@
+EF migrations: dotnet ef migrations add UpdateEntity 
+Database update: dotnet ef database update
+
+---
 # saitynai
 T120B165 Saityno taikomųjų programų projektavimas - projektas
 
