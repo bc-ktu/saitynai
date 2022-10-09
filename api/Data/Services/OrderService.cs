@@ -23,13 +23,15 @@ namespace api.Data.Services
 
         public async Task<List<Order>> GetAllOrders()
         {
+            //return await context.Orders.Include(p => p.Products).ToListAsync();
             return await context.Orders.ToListAsync();
         }
 
-        public async Task<Order?> GetOrder(int OrderId)
+        public async Task<Order?> GetOrder(int orderId)
         {
-            var Order = await context.Orders.FindAsync(OrderId);
-            return Order;
+            var order = await context.Orders.FirstOrDefaultAsync(i => i.Id == orderId);
+            //var order = await context.Orders.Include(p => p.Products).FirstOrDefaultAsync(i => i.Id == orderId);
+            return order;
         }
 
         public async Task CreateOrder(Order newOrder)

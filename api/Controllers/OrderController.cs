@@ -1,4 +1,6 @@
-﻿using api.Data.Services;
+﻿using api.Data.DTOs;
+using api.Data.Entities;
+using api.Data.Services;
 using api.DTOs;
 using api.Entities;
 using api.Services;
@@ -7,141 +9,99 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]s")]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService service;
-       // private readonly IProductService orderService;
+      //  private readonly IProductService service;
         private readonly IMapper mapper;
 
         public OrderController(IOrderService service, IMapper mapper)
         {
             this.service = service;
-            //this.orderService = orderService;
+            //this.service = service;
             this.mapper = mapper;
-        }/*
+        }
 
         [HttpGet]
-        public async Task<ActionResult<List<CommentDto>>> Get(int productId)
+        public async Task<ActionResult<List<OrderDto>>> Get()
         {
-            var order = await orderService.GetOrder(productId);
-            if (order == null)
-                return NotFound($"Produktas (Id={productId}) nerastas.");
-
-            var comments = await service.GetAllComments(productId);
-            if (comments.Count == 0)
-            {
-                return NotFound(string.Format($"Produktas (Id={productId}) komentarų neturi."));
-            }
-            List<CommentDto> result = mapper.Map<List<Comment>, List<CommentDto>>(comments);
+            var orders = await service.GetAllOrders();
+            List<OrderDto> result = mapper.Map<List<Order>, List<OrderDto>>(orders);
             return Ok(result);
         }
-
+        
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<CommentDto>> GetComment(int productId, int id)
+        public async Task<ActionResult<CommentDto>> GetOrder(int id)
         {
-            var product = await orderService.GetProduct(productId);
-            if (product == null)
-                return NotFound($"Produktas (Id={productId}) nerastas.");
+            var order = await service.GetOrder(id);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={id}) nerastas.");
 
-            var comment = await service.GetComment(productId, id);
-            if (comment == null)
-                return NotFound($"Produktas (Id={productId}) komentaro (Id={id}) neturi.");
-
-            var CommentDto = mapper.Map<Comment, CommentDto>(comment);
-            return Ok(CommentDto);
+            var OrderDto = mapper.Map<Order, OrderDto>(order);
+            return Ok(OrderDto);
         }
-
-        [HttpPut]
-        [Route("{id}")]
-        public async Task<ActionResult<CommentDto>> UpdateComment(int productId, int id, UpdateCommentDto updatedComment)
-        {
-            var product = await orderService.GetProduct(productId);
-            if (product == null)
-                return NotFound($"Produktas (Id={productId}) nerastas.");
-
-            var comment = await service.GetComment(productId, id);
-            if (comment == null)
-                return NotFound($"Komentaras (Id={id}) nerastas.");
-
-            var commentFromDto = mapper.Map<UpdateCommentDto, Comment>(updatedComment, comment);
-            commentFromDto.Product = product;
-            commentFromDto.DateEditted = DateTime.UtcNow;
-            commentFromDto.IsEditted = true;
-            try
-            {
-                await service.UpdateComment(productId, id, commentFromDto);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Nepavyko atnaujinti komentaro. Klaida: {ex.Message}");
-            }
-            return StatusCode(204);
-        }
-
+        //Order created, products are added to order with Put method
         [HttpPost]
-        public async Task<IActionResult> CreateComment(int productId, CreateCommentDto newComment)
+        public async Task<IActionResult> CreateOrder(CreateOrderDto newOrder)
         {
-            var product = await orderService.GetProduct(productId);
-            if (product == null)
-                return NotFound($"Produktas (Id={productId}) nerastas.");
-
-            var mapDtoToComment = mapper.Map<CreateCommentDto, Comment>(newComment);
-            mapDtoToComment.Product = product;
-            mapDtoToComment.DateCreated = DateTime.UtcNow;
+            var mapDtoToOrder = mapper.Map<CreateOrderDto, Order>(newOrder);
+            mapDtoToOrder.Status = OrderStatuses.Sukurtas;
+            mapDtoToOrder.DateCreated = DateTime.UtcNow;
             try
             {
-                await service.CreateComment(mapDtoToComment);
+                await service.CreateOrder(mapDtoToOrder);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko sukurti komentaro. Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko sukurti užsakymo. Klaida: {ex.Message}");
             }
             return StatusCode(201);
         }
 
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<ActionResult<OrderDto>> UpdateOrder(int id, UpdateOrderDto updatedOrder)
+        {
+            var order = await service.GetOrder(id);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={id}) nerastas.");
+
+            if (!Enum.IsDefined(typeof(OrderStatuses), updatedOrder.Status))
+                return BadRequest($"Netinkamas užsakymo statusas.");
+
+            var orderDto = mapper.Map<UpdateOrderDto, Order>(updatedOrder, order);
+            orderDto.DateEditted = DateTime.UtcNow;
+            try
+            {
+                await service.UpdateOrder(id, orderDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Nepavyko atnaujinti užsakymo. Klaida: {ex.Message}");
+            }
+            return StatusCode(204);
+        }
+
         [HttpDelete]
         [Route("{id}")]
-        public async Task<IActionResult> DeleteComment(int productId, int id)
+        public async Task<IActionResult> DeleteOrder(int id)
         {
-            var product = await orderService.GetProduct(productId);
-            if (product == null)
-                return NotFound($"Produktas (Id={productId}) nerastas.");
+            var order = await service.GetOrder(id);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={id}) nerastas.");
 
-            var Comment = await service.GetComment(productId, id);
-            if (Comment == null)
-                return NotFound($"Komentaras (Id={id}) nerastas.");
             try
             {
-                await service.DeleteComment(Comment);
+                await service.DeleteOrder(order);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko pašalinti komentaro. Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko pašalinti užsakymo. Klaida: {ex.Message}");
             }
-            return Ok(); //TODO: check code
+            return Ok();
         }
-
-        [HttpDelete]
-        public async Task<IActionResult> DeleteComments(int productId)
-        {
-            var product = await orderService.GetProduct(productId);
-            if (product == null)
-                return NotFound($"Produktas (Id={productId}) nerastas.");
-
-            var comments = await service.GetAllComments(productId);
-            if (comments == null)
-                return NotFound($"Produktas (Id={productId}) neturi komentarų.");
-            try
-            {
-                await service.DeleteComments(comments);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Nepavyko pašalinti komentarų. Klaida: {ex.Message}");
-            }
-            return Ok(); //TODO: check code
-        }
-*/
     }
 }

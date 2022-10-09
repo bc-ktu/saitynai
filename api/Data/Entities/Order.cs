@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace api.Entities
@@ -17,8 +18,8 @@ namespace api.Entities
         public DateTime DateCreated { get; set; }
         public DateTime? DateEditted { get; set; }
         public string Orderer { get; set; }
-        public decimal Total { get; set; }
-        public decimal Subtotal { get; set; } //without shipping
+        public decimal Total { get; set; } = 0;
+        public decimal Subtotal { get; set; } = 0;//without shipping
         public List<Product> Products { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 {
     public enum OrderStatuses
     {
+        Sukurtas,
         Pateiktas,
         Peržiūrimas,
         Atnaujintas,
