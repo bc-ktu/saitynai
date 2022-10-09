@@ -7,7 +7,7 @@
         Peržiūrimas,
         Atnaujintas,
         Patvirtintas,
-        Padarytas,
+        Padarytas, // uzsakymas atliktas, taciau nepristatytas uzsakovui
         Išsiųstas,
         Atsiimtas,
         Atliktas,

@@ -29,7 +29,6 @@ namespace api.Data.Services
         public async Task<Order?> GetOrder(int orderId)
         {
             var order = await context.Orders.FirstOrDefaultAsync(i => i.Id == orderId);
-            //var order = await context.Orders.Include(p => p.Products).FirstOrDefaultAsync(i => i.Id == orderId);
             return order;
         }
 
@@ -41,7 +40,9 @@ namespace api.Data.Services
 
         public async Task DeleteOrder(Order order)
         {
-            var getOrder = await context.Orders.Include(p => p.Products).FirstOrDefaultAsync(i => i.Id == order.Id);
+            var getOrder = await context.Orders
+                .Include(p => p.Products)
+                .FirstOrDefaultAsync(i => i.Id == order.Id);
             if (getOrder.Products.Count != 0)
             {
                 foreach (var p in getOrder.Products)

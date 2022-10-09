@@ -25,20 +25,17 @@ namespace api.Models
         public string Type { get; set; } = string.Empty;
         
         [Required(ErrorMessage = "Privalomas laukas")]
-        [MaxLength(256, ErrorMessage = "Šis laukas turi nuo 3 iki 30 simbolių")]
-        [MinLength(3, ErrorMessage = "Šis laukas turi nuo 3 iki 30 simbolių")]
+        [MaxLength(500, ErrorMessage = "Šis laukas turi nuo 3 iki 500 simbolių")]
+        [MinLength(3, ErrorMessage = "Šis laukas turi nuo 3 iki 500 simbolių")]
         public string Description { get; set; } = string.Empty;
         
         [Range(0, int.MaxValue, ErrorMessage = "Kiekis negali būti neigiamas")]
         public int Quantity { get; set; } = 1;
-        
-        public bool isNew { get; set; } = false;
-
-        public bool isDisplayed { get; set; } = false;
+        public bool CanBeBought { get; set; } = false;
+        public bool IsDisplayed { get; set; } = false;
         public string Creator { get; set; } // who created a product, if Product.Creator == Order.Orderer and Order.Status = Pateiktas then a user can delete the product
         public Order? Order { get; set; } = null;
         public int? OrderId { get; set; } = null;
         public List<Comment>? Comments { get; set; } = null;
-        // add author, isArchived
     }
 }

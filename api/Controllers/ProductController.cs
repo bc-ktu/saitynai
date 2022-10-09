@@ -80,7 +80,7 @@ namespace api.Controllers
         {           
             var product = await service.GetProduct(id);
             if (product == null)
-                return NotFound($"Produktas su Id {id} nerastas.");
+                return NotFound($"Produktas (Id={id}) nerastas.");
 
             var productFromDto = mapper.Map<ProductDto, Product>(updatedProduct, product);
             try
@@ -89,7 +89,7 @@ namespace api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko atnaujinti produkto. Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko atnaujinti produkto. Klaida: {ex.Message}.");
             }
             return StatusCode(204);
         }
@@ -104,22 +104,33 @@ namespace api.Controllers
 
             var product = await service.GetProduct(id);
             if (product == null)
-                return NotFound($"Produktas su Id {id} nerastas.");
+                return NotFound($"Produktas (Id={id}) nerastas.");
 
             if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
-            {
-                return BadRequest($"Negalima atnaujinti produkto prie užsakymo dėl statuso. Statusas - {order.Status}");
-            }
+                return BadRequest($"Negalima atnaujinti produkto prie užsakymo dėl statuso. Statusas - {order.Status}.");
+
+            if (updatedProduct.Price <= 0)
+                return BadRequest($"Kaina turi būti teigiama.");
+
+            if (updatedProduct.Quantity <= 0)
+                return BadRequest($"Netinkamas produkto kiekis: {updatedProduct.Quantity}.");
 
             var productFromDto = mapper.Map<ProductDto, Product>(updatedProduct, product);
             productFromDto.OrderId = orderId;
+            product.CanBeBought = false;
+            if (productFromDto.Price != product.Price || productFromDto.Quantity != product.Quantity)
+            {
+                order.Subtotal -= (decimal) product.Price * product.Quantity;
+                order.Subtotal += (decimal) productFromDto.Price * productFromDto.Quantity;
+                order.Total = order.Subtotal + 5; // TODO Investigate
+            }
             try
             {
                 await service.UpdateProduct(id, productFromDto);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko atnaujinti produkto. Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko atnaujinti produkto. Klaida: {ex.Message}.");
             }
             return StatusCode(204);
         }
@@ -129,14 +140,21 @@ namespace api.Controllers
         public async Task<IActionResult> CreateProduct(CreateProductDto newProduct)
         {
             var mapDtoToProduct = mapper.Map<CreateProductDto, Product>(newProduct);
-            mapDtoToProduct.isNew = true;
+
+            if (mapDtoToProduct.CanBeBought && (mapDtoToProduct.Price == null || mapDtoToProduct.Price <= 0))
+                return BadRequest($"Kainos laukelis turi būti užpildytas arba prekė turi būti neparduodama.");
+
+            if (newProduct.Quantity <= 0)
+            {
+                return BadRequest($"Netinkamas produkto kiekis: {newProduct.Quantity}.");
+            }
             try
             {
                 await service.CreateProduct(mapDtoToProduct);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko sukurti produkto. Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko sukurti produkto. Klaida: {ex.Message}.");
             }
             return StatusCode(201);
         }
@@ -150,20 +168,29 @@ namespace api.Controllers
                 return NotFound($"Užsakymas (Id={orderId}) nerastas.");
 
             if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
-            {
-                return BadRequest($"Negalima sukurti produkto prie užsakymo dėl statuso. Statusas - {order.Status}");
-            }
+                return BadRequest($"Negalima sukurti produkto prie užsakymo dėl statuso. Statusas - {order.Status.ToString().ToLower()}.");
+
+            if (newProduct.Price == null || newProduct.Price <= 0)
+                return BadRequest($"Kainos laukelis turi būti užpildytas.");
+
+            if (newProduct.Quantity <= 0)
+                return BadRequest($"Netinkamas produkto kiekis: {newProduct.Quantity}.");
 
             var mapDtoToProduct = mapper.Map<CreateProductDto, Product>(newProduct);
             mapDtoToProduct.OrderId = orderId;
-            mapDtoToProduct.isNew = true;
+            mapDtoToProduct.CanBeBought = false;
+            mapDtoToProduct.IsDisplayed = false;
+            mapDtoToProduct.Creator = order.Orderer;
+            order.Subtotal += (decimal) mapDtoToProduct.Price * mapDtoToProduct.Quantity;
+            order.DateEditted = DateTime.UtcNow;
+            order.Total = order.Subtotal + 5;
             try
             {
                 await service.CreateProduct(mapDtoToProduct);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko sukurti produkto. Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko sukurti produkto. Klaida: {ex.Message}.");
             }
             return StatusCode(201);
         }
@@ -185,9 +212,9 @@ namespace api.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko pašalinti produkto. Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko pašalinti produkto. Klaida: {ex.Message}.");
             }
-            return Ok(); //TODO: check code
+            return StatusCode(204);
         }
 
         [HttpDelete]
@@ -203,23 +230,24 @@ namespace api.Controllers
                 return NotFound($"Produktas su Id {id} nerastas.");
 
             if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
-            {
-                return BadRequest($"Negalima ištrinti produkto dėl statuso. Statusas - {order.Status}");
-            }
+                return BadRequest($"Negalima ištrinti produkto dėl statuso. Statusas - {order.Status.ToString().ToLower()}.");
 
+            order.DateEditted = DateTime.UtcNow;
+            order.Subtotal -= (decimal)product.Price * product.Quantity;
+            order.Total = order.Subtotal >= 0 ? order.Subtotal + 5 : 0;
             try
             {
                 await service.DeleteProduct(product);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko pašalinti produkto. Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko pašalinti produkto. Klaida: {ex.Message}.");
             }
-            return Ok(); //TODO: check code
+            return StatusCode(204);
         }
 
         [HttpPatch]
-        [Route("api/Orders/{orderId}/[controller]s/{id}")]
+        [Route("api/Orders/{orderId}/[controller]s/{id}")] //???
         public async Task<IActionResult> RemoveProductFromOrder(int id, int orderId)
         {
             var order = await orderService.GetOrder(orderId);
@@ -231,23 +259,25 @@ namespace api.Controllers
                 return NotFound($"Produktas su Id {id} nerastas.");
 
             if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
-            {
-                return BadRequest($"Negalima pašalinti produkto iš užsakymo dėl statuso. Statusas - {order.Status}");
-            }
+                return BadRequest($"Negalima pašalinti produkto iš užsakymo dėl statuso. Statusas - {order.Status.ToString().ToLower()}.");
 
+            order.Subtotal -= (decimal)product.Price * product.Quantity;
+            order.Total = order.Subtotal >= 0 ? order.Subtotal + 5 : 0;
+            order.DateEditted = DateTime.UtcNow;
+            product.CanBeBought = true;
             try
             {
                 await service.RemoveProductFromOrder(product.Id);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko produkto pašalinti produkto iš užsakymo. Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko produkto pašalinti produkto iš užsakymo. Klaida: {ex.Message}.");
             }
-            return Ok(); //TODO: check code
+            return StatusCode(204);
         }
 
         [HttpPatch]
-        [Route("api/Orders/{orderId}/[controller]s/{id}")]
+        [Route("api/Orders/{orderId}/[controller]s/{id}/add")] // ???
         public async Task<IActionResult> AddExistingProductToOrder(int id, int orderId)
         {
             var order = await orderService.GetOrder(orderId);
@@ -259,19 +289,31 @@ namespace api.Controllers
                 return NotFound($"Produktas su Id {id} nerastas.");
 
             if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
-            {
-                return BadRequest($"Negalima pridėti produkto iš užsakymo dėl statuso. Statusas - {order.Status}");
-            }
+                return BadRequest($"Negalima pridėti produkto prie užsakymo dėl statuso. Statusas - {order.Status.ToString().ToLower()}.");
+
+            if (!product.CanBeBought)
+                return BadRequest($"Produktas (Id={id}) neparduodamas.");
+
+            if (product.Price == null || product.Price <= 0)
+                return BadRequest($"Kainos laukelis turi būti užpildytas.");
+
+            if (product.Quantity <= 0)
+                return BadRequest($"Netinkamas produkto kiekis (Produkto Id={id}).");
+
+            order.Subtotal += (decimal)product.Price * product.Quantity;
+            order.Total = order.Subtotal + 5;
+            product.CanBeBought = false;
             product.OrderId = orderId;
+            order.DateEditted = DateTime.UtcNow;
             try
             {
                 await service.AddExistingProductToOrder(product);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Nepavyko produkto . Klaida: {ex.Message}");
+                return BadRequest($"Nepavyko produkto pridėti prie užsakymo. Klaida: {ex.Message}.");
             }
-            return Ok(); //TODO: check code
+            return StatusCode(204);
         }
     }
 }

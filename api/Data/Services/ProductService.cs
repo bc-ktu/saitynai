@@ -63,18 +63,25 @@ namespace api.Services
 
         public async Task<List<Product>> GetAllProducts(int orderId)
         {
-            var order = await context.Orders.Include(p => p.Products).Where(o => o.Id == orderId).FirstOrDefaultAsync();
+            var order = await context.Orders
+                .Include(p => p.Products)
+                .Where(o => o.Id == orderId)
+                .FirstOrDefaultAsync();
             return order.Products;
         }
 
         public async Task<Product?> GetProduct(int productId, int orderId)
         {
-            return await context.Products.Where(o => o.Id == productId && o.OrderId == orderId).FirstOrDefaultAsync();
+            return await context.Products
+                .Where(o => o.Id == productId && o.OrderId == orderId)
+                .FirstOrDefaultAsync();
         }
 
         public async Task RemoveProductFromOrder(int productId)
         {
-            var product = context.Products.Where(o => o.Id == productId).FirstOrDefault();
+            var product = context.Products
+                .Where(o => o.Id == productId)
+                .FirstOrDefault();
             product.OrderId = null;
             await context.SaveChangesAsync();
         }

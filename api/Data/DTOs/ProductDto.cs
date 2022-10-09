@@ -9,7 +9,8 @@ namespace api.DTOs
         public string Type { get; set; }
         public string Description { get; set; }
         public int Quantity { get; set; }
-        public bool IsFeatured { get; set; }// change dto
+        public bool CanBeBought { get; set; }
+        public bool IsDisplayed { get; set; }
 
     }
     public class CreateProductDto
@@ -19,13 +20,9 @@ namespace api.DTOs
         public string Type { get; set; }
         public string Description { get; set; }
         public int Quantity { get; set; }
-        public bool IsFeatured { get; set; }
-        public string Creator { get; set; } // change dto
+        public bool CanBeBought { get; set; }
+        public string Creator { get; set; } 
+        public bool IsDisplayed { get; set; }
 
-    }
-
-    public class UpdateProductQuantityDto
-    {
-        public int Quantity { get; set; }
     }
 }

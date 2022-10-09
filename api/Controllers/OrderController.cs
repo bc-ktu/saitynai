@@ -41,6 +41,7 @@ namespace api.Controllers
             var OrderDto = mapper.Map<Order, OrderDto>(order);
             return Ok(OrderDto);
         }
+
         //Order created, products are added to order with Put method
         [HttpPost]
         public async Task<IActionResult> CreateOrder(CreateOrderDto newOrder)
@@ -93,7 +94,7 @@ namespace api.Controllers
 
             if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
             {
-                return BadRequest($"Negalima pašalinti užsakymo dėl statuso. Statusas - {order.Status}");
+                return BadRequest($"Negalima pašalinti užsakymo dėl statuso. Statusas - {order.Status.ToString().ToLower()}");
             }
 
             try
@@ -104,7 +105,7 @@ namespace api.Controllers
             {
                 return BadRequest($"Nepavyko pašalinti užsakymo. Klaida: {ex.Message}");
             }
-            return Ok();
+            return StatusCode(204);
         }
     }
 }

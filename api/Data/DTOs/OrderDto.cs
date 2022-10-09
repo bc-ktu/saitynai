@@ -14,13 +14,6 @@ namespace api.Data.DTOs
         public OrderStatuses Status { get; set; }
 
     }
-    /*public class UpdateOrderStatusDto
-    {
-        public OrderStatuses Status { get; set; } = OrderStatuses.Atšauktas;
-        public DateTime DateEditted { get; set; } = DateTime.Now;
-
-    }*/
-
     public class OrderDto
     {
         public OrderStatuses Status { get; set; }
@@ -29,6 +22,5 @@ namespace api.Data.DTOs
         public string Orderer { get; set; }
         public decimal Total { get; set; }
         public decimal Subtotal { get; set; } 
-       // public List<Product> Products { get; set; }
     }
 }
