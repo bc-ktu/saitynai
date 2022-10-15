@@ -85,6 +85,7 @@ namespace api.Controllers
             if (product == null)
                 return NotFound($"Produktas (Id={id}) nerastas.");
 
+
             var productFromDto = mapper.Map<ProductDto, Product>(updatedProduct, product);
             try
             {
