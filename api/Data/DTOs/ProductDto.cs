@@ -2,6 +2,7 @@ using api.Entities;
 
 namespace api.DTOs
 {
+    // prideti ID
     public class ProductDto
     {
         public decimal? Price { get; set; }

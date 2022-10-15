@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
+//id ir role (token viduje)
+//nice to have: refresh token
+
 namespace api.Controllers
 {
     [ApiController]
@@ -247,7 +250,7 @@ namespace api.Controllers
         }
 
         [HttpPatch]
-        [Route("api/Orders/{orderId}/[controller]s/{id}")] //???
+        [Route("api/Orders/{orderId}/[controller]s/{id}")] //??? perkelti i put, parasyti metoda kuris pereitu per visus products ir isimtu is order, jei orderid = null
         public async Task<IActionResult> RemoveProductFromOrder(int id, int orderId)
         {
             var order = await orderService.GetOrder(orderId);

@@ -33,7 +33,8 @@ namespace api.Models
         public int Quantity { get; set; } = 1;
         public bool CanBeBought { get; set; } = false;
         public bool IsDisplayed { get; set; } = false;
-        public string Creator { get; set; } // who created a product, if Product.Creator == Order.Orderer and Order.Status = Pateiktas then a user can delete the product
+        public string Creator { get; set; } // keisti į ID
+                                            // who created a product, if Product.Creator == Order.Orderer and Order.Status = Pateiktas then a user can delete the product
         public Order? Order { get; set; } = null;
         public int? OrderId { get; set; } = null;
         public List<Comment>? Comments { get; set; } = null;

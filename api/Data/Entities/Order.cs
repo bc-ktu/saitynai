@@ -1,4 +1,4 @@
-using api.Data.Entities;
+﻿using api.Data.Entities;
 using api.Models;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace api.Entities
         public OrderStatuses Status { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateEditted { get; set; }
-        public string Orderer { get; set; }
+        public string Orderer { get; set; } // keisti į ID
         public decimal Total { get; set; } = 0;
         public decimal Subtotal { get; set; } = 0;//without shipping
         public List<Product> Products { get; set; }

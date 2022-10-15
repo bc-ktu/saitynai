@@ -2,6 +2,7 @@ using api.Models;
 
 namespace api.DTOs
 {
+    // prideti ID
     public class CommentDto
     {
         public DateTime DateCreated { get; set; }

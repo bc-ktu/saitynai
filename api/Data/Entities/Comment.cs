@@ -27,7 +27,7 @@ namespace api.Entities
         public DateTime? DateEditted { get; set; }
         public bool IsFeatured { get; set; }
         public bool IsDeleted { get; set; }
-        public string Author { get; set; }
+        public string Author { get; set; } // keisti į ID
         [JsonIgnore]
         public Product Product { get; set; }
         [JsonIgnore]
