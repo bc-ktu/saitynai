@@ -1,8 +1,10 @@
 ﻿namespace api.Data.Entities
 {
-    public enum Role
+    public static class Roles
     {
-        Admin,
-        RegisteredUser
+        public const string Admin = nameof(Admin);
+        public const string RegisteredUser = nameof(RegisteredUser);
+
+        public static readonly IReadOnlyCollection<string> All = new[] { Admin, RegisteredUser };
     }
 }

@@ -17,7 +17,9 @@ namespace api.Entities
         public OrderStatuses Status { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateEditted { get; set; }
-        public string Orderer { get; set; } // keisti į ID
+        [Required]
+        public int OrdererId { get; set; }
+        public RegisteredUser Orderer { get; set; }
         public decimal Total { get; set; } = 0;
         public decimal Subtotal { get; set; } = 0;//without shipping
         public List<Product> Products { get; set; }

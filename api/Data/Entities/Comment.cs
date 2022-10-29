@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using api.Data.Entities;
 using api.Models;
 
 namespace api.Entities
@@ -27,7 +28,9 @@ namespace api.Entities
         public DateTime? DateEditted { get; set; }
         public bool IsFeatured { get; set; }
         public bool IsDeleted { get; set; }
-        public string Author { get; set; } // keisti į ID
+        [Required]
+        public int AuthorId { get; set; } // keisti į ID
+        public RegisteredUser Author { get; set; } // keisti į ID
         [JsonIgnore]
         public Product Product { get; set; }
         [JsonIgnore]

@@ -1,8 +1,10 @@
 ﻿using api.Data.DTOs;
+using api.Data.Entities;
 using api.DTOs;
 using api.Entities;
 using api.Models;
 using AutoMapper;
+using System.Collections.Generic;
 
 namespace api.Controllers
 {
@@ -23,6 +25,12 @@ namespace api.Controllers
             CreateMap<OrderDto, Order>();
             CreateMap<CreateOrderDto, Order>();
             CreateMap<UpdateOrderDto, Order>();
+
+            CreateMap<CreateUserDto, RegisteredUser>();
+            CreateMap<RegisteredUser, CreateUserDto>();
+            CreateMap<RegisteredUser, UserDto>();
+
+            CreateMap<RegisteredUser, SuccessfulLoginResponseDto>();
         }
     }
 

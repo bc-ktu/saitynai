@@ -100,8 +100,11 @@ namespace api.Controllers
 
         [HttpPut]
         [Route("api/Orders/{orderId}/[controller]s/{id}")]
-        public async Task<ActionResult<ProductDto>> UpdateProduct(int id, ProductDto updatedProduct, int orderId)
+        public async Task<ActionResult<ProductDto>> UpdateProduct(int id, ProductDto updatedProduct, int orderId, bool remove)
         {
+            if (remove)
+                _ = RemoveProductFromOrder(id, orderId);
+
             var order = await orderService.GetOrder(orderId);
             if (order == null)
                 return NotFound($"Užsakymas (Id={orderId}) nerastas.");
@@ -251,37 +254,7 @@ namespace api.Controllers
         }
 
         [HttpPatch]
-        [Route("api/Orders/{orderId}/[controller]s/{id}")] //??? perkelti i put, parasyti metoda kuris pereitu per visus products ir isimtu is order, jei orderid = null
-        public async Task<IActionResult> RemoveProductFromOrder(int id, int orderId)
-        {
-            var order = await orderService.GetOrder(orderId);
-            if (order == null)
-                return NotFound($"Užsakymas (Id={orderId}) nerastas.");
-
-            var product = await service.GetProduct(id);
-            if (product == null)
-                return NotFound($"Produktas su Id {id} nerastas.");
-
-            if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
-                return BadRequest($"Negalima pašalinti produkto iš užsakymo dėl statuso. Statusas - {order.Status.ToString().ToLower()}.");
-
-            order.Subtotal -= (decimal)product.Price * product.Quantity;
-            order.Total = order.Subtotal >= 0 ? order.Subtotal + 5 : 0;
-            order.DateEditted = DateTime.UtcNow;
-            product.CanBeBought = true;
-            try
-            {
-                await service.RemoveProductFromOrder(product.Id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Nepavyko produkto pašalinti produkto iš užsakymo. Klaida: {ex.Message}.");
-            }
-            return StatusCode(204);
-        }
-
-        [HttpPatch]
-        [Route("api/Orders/{orderId}/[controller]s/{id}/add")] // ???
+        [Route("api/Orders/{orderId}/[controller]s/{id}")] 
         public async Task<IActionResult> AddExistingProductToOrder(int id, int orderId)
         {
             var order = await orderService.GetOrder(orderId);
@@ -316,6 +289,35 @@ namespace api.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"Nepavyko produkto pridėti prie užsakymo. Klaida: {ex.Message}.");
+            }
+            return StatusCode(204);
+        }
+
+        //??? perkelti i put, parasyti metoda kuris pereitu per visus products ir isimtu is order, jei orderid = null
+        private async Task<IActionResult> RemoveProductFromOrder(int id, int orderId)
+        {
+            var order = await orderService.GetOrder(orderId);
+            if (order == null)
+                return NotFound($"Užsakymas (Id={orderId}) nerastas.");
+
+            var product = await service.GetProduct(id);
+            if (product == null)
+                return NotFound($"Produktas su Id {id} nerastas.");
+
+            if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
+                return BadRequest($"Negalima pašalinti produkto iš užsakymo dėl statuso. Statusas - {order.Status.ToString().ToLower()}.");
+
+            order.Subtotal -= (decimal)product.Price * product.Quantity;
+            order.Total = order.Subtotal >= 0 ? order.Subtotal + 5 : 0;
+            order.DateEditted = DateTime.UtcNow;
+            product.CanBeBought = true;
+            try
+            {
+                await service.RemoveProductFromOrder(product.Id);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Nepavyko produkto pašalinti produkto iš užsakymo. Klaida: {ex.Message}.");
             }
             return StatusCode(204);
         }
