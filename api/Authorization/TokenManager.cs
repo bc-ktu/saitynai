@@ -8,7 +8,7 @@ using System.Text;
 
 namespace api.Authorization
 {
-    public interface ITokenManager
+   /* public interface ITokenManager
     {
         Task<string> CreateAccessTokenAsync(RegisteredUser user);
     }
@@ -30,7 +30,7 @@ namespace api.Authorization
             {
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(CustomClaims.UserId, user.Id.ToString())
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id)
             };
             authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
 
@@ -43,5 +43,5 @@ namespace api.Authorization
             );
             return new JwtSecurityTokenHandler().WriteToken(accessSecurityToken);
         }
-    }
+    }*/
 }

@@ -12,8 +12,8 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20221029174746_update user role")]
-    partial class updateuserrole
+    [Migration("20221104161824_Identity")]
+    partial class Identity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -123,8 +123,8 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AuthorId1")
                         .HasColumnType("nvarchar(450)");
@@ -180,8 +180,8 @@ namespace api.Migrations
                     b.Property<DateTime?>("DateEditted")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("OrdererId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("OrdererId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("OrdererId1")
                         .HasColumnType("nvarchar(450)");
@@ -213,8 +213,10 @@ namespace api.Migrations
                     b.Property<bool>("CanBeBought")
                         .HasColumnType("bit");
 
-                    b.Property<string>("CreatorId")
-                        .IsRequired()
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatorId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
@@ -246,7 +248,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatorId");
+                    b.HasIndex("CreatorId1");
 
                     b.HasIndex("OrderId");
 
@@ -416,9 +418,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Data.Entities.RegisteredUser", "Creator")
                         .WithMany()
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreatorId1");
 
                     b.HasOne("api.Entities.Order", "Order")
                         .WithMany("Products")

@@ -36,10 +36,7 @@ namespace api.Data
                 .Entity<Comment>()
                 .HasOne(c => c.Product)
                 .WithMany(p => p.Comments)
-                .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
-
         }
-
     }
 }

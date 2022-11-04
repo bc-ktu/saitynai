@@ -8,6 +8,7 @@ namespace api.Data.Services
         Task CreateOrder(Order newOrder);
         Task DeleteOrder(Order Order);
         Task<List<Order>> GetAllOrders();
+        Task<List<Order>> GetAllUsersOrders(string id);
         Task<Order?> GetOrder(int OrderId);
         Task UpdateOrder(int id, Order Order);
     }
@@ -57,6 +58,11 @@ namespace api.Data.Services
         {
             context.Orders.Update(order);
             await context.SaveChangesAsync();
+        }
+
+        public async Task<List<Order>> GetAllUsersOrders(string id)
+        {
+            return await context.Orders.Where(a => a.OrdererId == id).ToListAsync();
         }
     }
 }

@@ -62,7 +62,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("/login")]
+        [Route("/token")]
         [AllowAnonymous]
         public async Task<ActionResult> Login(LoginUserDto loginDto)
         {
@@ -89,7 +89,7 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("/Users")]
-        [Authorize(Roles="Admin")]
+        [Authorize(Roles=Roles.Admin)]
         public async Task<ActionResult<List<UserDto>>> GetRegisteredUsers()
         {
             List<RegisteredUser> users = (List<RegisteredUser>)await userManager.GetUsersInRoleAsync(Roles.RegisteredUser);
@@ -97,7 +97,7 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles=Roles.Admin)]
         public async Task<ActionResult<UserDto>> UpdateUser(string email)
         {
             var user = await userManager.FindByEmailAsync(email);
@@ -114,6 +114,35 @@ namespace api.Controllers
                 return BadRequest("Nepavyko išsaugoti.");
 
             await Execute(user, psw);
+
+            return Ok(mapper.Map<RegisteredUser, UserDto>(user));
+        }
+
+        [HttpPut]
+        [Route("/PasswordReset")]
+        [AllowAnonymous]
+        public async Task<ActionResult<UserDto>> ChangePassword(PasswordResetUserDto passwordResetUserDto)
+        {
+            var user = await userManager.FindByEmailAsync(passwordResetUserDto.Email);
+            if (user == null)
+                return NotFound("Neteisingas elektroninis paštas arba slaptažodis.");
+
+            var isPasswordValid = await userManager.CheckPasswordAsync(user, passwordResetUserDto.OldPassword);
+            if (!isPasswordValid)
+                return NotFound("Neteisingas elektroninis paštas arba slaptažodis.");
+
+            if (!user.IsApproved)
+                return BadRequest("Vartotojas nėra patvirtintas.");
+
+            var change = await userManager.ChangePasswordAsync(user, passwordResetUserDto.OldPassword, passwordResetUserDto.NewPassword);
+            if(!change.Succeeded)
+                return BadRequest("Nepavyko pakeisti slaptažodžio.");
+
+            var isUpdated = await userManager.UpdateAsync(user);
+            if (!isUpdated.Succeeded)
+                return BadRequest("Nepavyko išsaugoti.");
+
+            user.HasFinishedRegistration = true;
 
             return Ok(mapper.Map<RegisteredUser, UserDto>(user));
         }

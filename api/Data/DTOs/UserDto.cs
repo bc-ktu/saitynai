@@ -16,19 +16,6 @@ namespace api.Data.DTOs
         public string RefreshToken { get; set; }
     }
 
-    /* public class RegisterUserDto
-     {
-         [Required]
-         public string FirstName { get; set; }
-         [Required]
-         public string LastName { get; set; }
-         [Required]
-         [EmailAddress]
-         public string Email { get; set; }
-         [Required]
-         public string Phone { get; set; }
-
-     }*/
     public class LoginUserDto
     {
         public string Email { get; set; }
@@ -37,7 +24,7 @@ namespace api.Data.DTOs
 
     public class UserDto
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
@@ -48,20 +35,19 @@ namespace api.Data.DTOs
         public bool IsApproved { get; set; }
         public bool HasFinishedRegistration { get; set; }
     }
-    public class ApproveByAdminUserDto
+    public class PasswordResetUserDto
     {
-        public Guid Id { get; set; }
-        public string PasswordHash { get; set; }
-        public bool IsApproved { get; set; }
+        public string Email { get; set; }
+        public string NewPassword { get; set; }
+        public string OldPassword { get; set; }
     }
     public class HasFinishedRegistrationUserDto
     {
-        public Guid Id { get; set; }
+        public string Email { get; set; }
         public bool HasFinishedRegistration { get; set; }
     }
     public class UpdateUserDto
     {
-        public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }

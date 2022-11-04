@@ -293,7 +293,6 @@ namespace api.Controllers
             return StatusCode(204);
         }
 
-        //??? perkelti i put, parasyti metoda kuris pereitu per visus products ir isimtu is order, jei orderid = null
         private async Task<IActionResult> RemoveProductFromOrder(int id, int orderId)
         {
             var order = await orderService.GetOrder(orderId);

@@ -10,15 +10,15 @@ namespace api.DTOs
         public string Text { get; set; }
         public bool isFeatured { get; set; }
         public bool isDeleted { get; set; }
-        public int AuthorId { get; set; } // change to reference id
-        public string Id { get; set; } 
+        public string AuthorId { get; set; } // change to reference id
+        public int Id { get; set; } 
     }
     public class CreateCommentDto
     {
         public string Title { get; set; }
         public string Text { get; set; }
         public bool isFeatured { get; set; }
-        public int AuthorId { get; set; } // change to reference id
+        public string AuthorId { get; set; } // change to reference id
     }
 
     public class UpdateCommentDto
@@ -26,6 +26,7 @@ namespace api.DTOs
         public string Title { get; set; }
         public string Text { get; set; }
         public bool isFeatured { get; set; }
+        public string AuthorId { get; set; }
     }
 
 }

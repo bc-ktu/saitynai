@@ -12,8 +12,8 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20221027202046_identity")]
-    partial class identity
+    [Migration("20221104212309_Identity2")]
+    partial class Identity2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -123,10 +123,7 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AuthorId1")
+                    b.Property<string>("AuthorId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateCreated")
@@ -157,9 +154,13 @@ namespace api.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId1");
+                    b.HasIndex("AuthorId");
 
                     b.HasIndex("ProductId");
 
@@ -180,10 +181,7 @@ namespace api.Migrations
                     b.Property<DateTime?>("DateEditted")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("OrdererId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OrdererId1")
+                    b.Property<string>("OrdererId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Status")
@@ -195,9 +193,13 @@ namespace api.Migrations
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("OrdererId1");
+                    b.HasIndex("OrdererId");
 
                     b.ToTable("Orders");
                 });
@@ -214,7 +216,6 @@ namespace api.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("CreatorId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
@@ -243,6 +244,10 @@ namespace api.Migrations
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -390,7 +395,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Data.Entities.RegisteredUser", "Author")
                         .WithMany()
-                        .HasForeignKey("AuthorId1");
+                        .HasForeignKey("AuthorId");
 
                     b.HasOne("api.Models.Product", "Product")
                         .WithMany("Comments")
@@ -407,7 +412,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Data.Entities.RegisteredUser", "Orderer")
                         .WithMany()
-                        .HasForeignKey("OrdererId1");
+                        .HasForeignKey("OrdererId");
 
                     b.Navigation("Orderer");
                 });
@@ -416,9 +421,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Data.Entities.RegisteredUser", "Creator")
                         .WithMany()
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreatorId");
 
                     b.HasOne("api.Entities.Order", "Order")
                         .WithMany("Products")

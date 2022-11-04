@@ -23,7 +23,7 @@ namespace api.Controllers
 
             CreateMap<Order, OrderDto>();
             CreateMap<OrderDto, Order>();
-            CreateMap<CreateOrderDto, Order>();
+           // CreateMap<CreateOrderDto, Order>();
             CreateMap<UpdateOrderDto, Order>();
 
             CreateMap<CreateUserDto, RegisteredUser>();

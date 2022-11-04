@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using api.Data.Entities;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authorization;
+using api.Authorization.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,10 +49,18 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddTransient<IProductService, ProductService>();
 builder.Services.AddTransient<ICommentService, CommentService>();
 builder.Services.AddTransient<IOrderService, OrderService>();
-builder.Services.AddTransient<ITokenManager, TokenManager>(); // remove ?
+//builder.Services.AddTransient<ITokenManager, TokenManager>(); // remove ?
 builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<AuthDbSeeder>();
+
+builder.Services.AddAuthorization(options => 
+{
+    options.AddPolicy(PolicyNames.ResourceOwner, policy => policy.Requirements.Add(new ResourceOwnerRequirement()));
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, ResourceOwnerAuthorizationHandler>();  
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -98,6 +108,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+//using var scope = app.Services.CreateScope();
+//var dbContext = scope.ServiceProvider.GetRequiredService<StoreContext>();
+//dbContext.Database.Migrate();
 
 var dbSeeder = app.Services.CreateScope().ServiceProvider.GetRequiredService<AuthDbSeeder>();
 await dbSeeder.SeedAsync();

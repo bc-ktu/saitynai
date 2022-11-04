@@ -27,7 +27,8 @@ namespace api.Data.Services
         {
             var authClaims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, id),
+                new Claim(ClaimTypes.NameIdentifier, id),
+                new Claim(ClaimTypes.Email, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, id)
             };

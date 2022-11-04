@@ -33,7 +33,7 @@ namespace api.Controllers
         {
             var product = await productService.GetProduct(productId);
             if (product == null)
-                return NotFound($"Produktas (Id={productId}) nerastas.");
+                return NotFound ($"Produktas (Id={productId}) nerastas.");
 
             var comments = await service.GetAllComments(productId);
             if (comments.Count == 0)

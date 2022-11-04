@@ -1,13 +1,15 @@
 ﻿
+using api.Authorization.Model;
 using api.Data.Entities;
 using api.Entities;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 
 namespace api.Models
 {
-    public class Product
+    public class Product : IUserOwnedResource 
     {
         [Key]
         public int Id { get; set; }
@@ -34,11 +36,8 @@ namespace api.Models
         public int Quantity { get; set; } = 1;
         public bool CanBeBought { get; set; } = false;
         public bool IsDisplayed { get; set; } = false;
-        [Required]
-        public string CreatorId { get; set; } // keisti į ID
-                                              // who created a product, if Product.Creator == Order.Orderer and Order.Status = Pateiktas then a user can delete the product
-        [Required]
-        public RegisteredUser Creator { get; set; }
+        public RegisteredUser? Creator { get; set; }
+        public string? CreatorId { get { return UserId; } set { UserId = value; } }  // who created a product, if Product.Creator == Order.Orderer and Order.Status = Pateiktas then a user can delete the product
         public Order? Order { get; set; } = null;
         public int? OrderId { get; set; } = null;
         public List<Comment>? Comments { get; set; } = null;
