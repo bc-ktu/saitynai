@@ -18,7 +18,6 @@ namespace api.DTOs
         public string Title { get; set; }
         public string Text { get; set; }
         public bool isFeatured { get; set; }
-        public string AuthorId { get; set; } // change to reference id
     }
 
     public class UpdateCommentDto
@@ -26,7 +25,6 @@ namespace api.DTOs
         public string Title { get; set; }
         public string Text { get; set; }
         public bool isFeatured { get; set; }
-        public string AuthorId { get; set; }
     }
 
 }

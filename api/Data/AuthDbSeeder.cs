@@ -53,7 +53,6 @@ namespace api.Data
                 if (createAdminUser.Succeeded)
                 {
                     await userManager.AddToRoleAsync(newAdminUser, Roles.Admin);
-                    await userManager.AddToRoleAsync(newAdminUser, Roles.RegisteredUser);
                 }
             }
         }

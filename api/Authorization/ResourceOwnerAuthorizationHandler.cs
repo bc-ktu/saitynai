@@ -10,8 +10,6 @@ namespace api.Authorization
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ResourceOwnerRequirement requirement, IUserOwnedResource resource)
         {
-            var s1 = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var s2 = resource.UserId;
             if (context.User.IsInRole(Roles.Admin) || context.User.FindFirstValue(ClaimTypes.NameIdentifier) == resource.UserId)
             {
                 context.Succeed(requirement);

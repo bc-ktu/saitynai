@@ -13,6 +13,7 @@ namespace api.DTOs
         public int Quantity { get; set; }
         public bool CanBeBought { get; set; }
         public bool IsDisplayed { get; set; }
+        public string CreatorId { get; set; }
 
     }
     public class CreateProductDto
@@ -23,7 +24,6 @@ namespace api.DTOs
         public string Description { get; set; }
         public int Quantity { get; set; }
         public bool CanBeBought { get; set; }
-        public string CreatorId { get; set; } 
         public bool IsDisplayed { get; set; }
 
     }

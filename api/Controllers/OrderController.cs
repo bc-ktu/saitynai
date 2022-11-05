@@ -56,9 +56,7 @@ namespace api.Controllers
 
             var authorizationResult = await authorizationService.AuthorizeAsync(User, order, PolicyNames.ResourceOwner);
             if (!authorizationResult.Succeeded)
-            {
                 return Forbid();
-            }
 
             var OrderDto = mapper.Map<Order, OrderDto>(order);
             return Ok(OrderDto);
@@ -96,9 +94,7 @@ namespace api.Controllers
 
             var authorizationResult = await authorizationService.AuthorizeAsync(User, order, PolicyNames.ResourceOwner);
             if (!authorizationResult.Succeeded)
-            {
                 return Forbid();
-            }
 
             if (!Enum.IsDefined(typeof(OrderStatuses), updatedOrder.Status))
                 return BadRequest($"Netinkamas užsakymo statusas.");
@@ -127,9 +123,7 @@ namespace api.Controllers
 
             var authorizationResult = await authorizationService.AuthorizeAsync(User, order, PolicyNames.ResourceOwner);
             if(!authorizationResult.Succeeded)
-            {
                 return Forbid();
-            }
 
             if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
             {

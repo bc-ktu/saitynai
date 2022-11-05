@@ -32,7 +32,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("/register")]
+        [Route("/Register")]
         [AllowAnonymous]
         public async Task<IActionResult> Register (CreateUserDto registerUserDto) 
         {
@@ -62,7 +62,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("/token")]
+        [Route("/Token")]
         [AllowAnonymous]
         public async Task<ActionResult> Login(LoginUserDto loginDto)
         {

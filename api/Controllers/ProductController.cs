@@ -1,4 +1,5 @@
-﻿using api.Data;
+﻿using api.Authorization.Model;
+using api.Data;
 using api.Data.Entities;
 using api.Data.Services;
 using api.DTOs;
@@ -6,9 +7,11 @@ using api.Entities;
 using api.Models;
 using api.Services;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using System.Security.Claims;
 
 //id ir role (token viduje)
 //nice to have: refresh token
@@ -21,16 +24,19 @@ namespace api.Controllers
         private readonly IProductService service;
         private readonly IOrderService orderService;
         private readonly IMapper mapper;
+        private readonly IAuthorizationService authorizationService;
 
-        public ProductController(IProductService service, IOrderService orderService, IMapper mapper)
+        public ProductController(IProductService service, IOrderService orderService, IMapper mapper, IAuthorizationService authorizationService)
         {
             this.service = service;
             this.orderService = orderService;
             this.mapper = mapper;
+            this.authorizationService = authorizationService;
         }
-        
+
         [HttpGet]
         [Route("api/[controller]s")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<ProductDto>>> Get()
         {
             var products = await service.GetAllProducts();
@@ -40,11 +46,16 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("api/Orders/{orderId}/[controller]s")]
+        [Authorize(Roles = Roles.Admin + "," + Roles.RegisteredUser)]
         public async Task<ActionResult<List<ProductDto>>> Get(int orderId)
         {
             var order = await orderService.GetOrder(orderId);
             if (order == null)
                 return NotFound($"Užsakymas (Id={orderId}) nerastas.");
+
+            var authorizationResult = await authorizationService.AuthorizeAsync(User, order, PolicyNames.ResourceOwner);
+            if (!authorizationResult.Succeeded)
+                return Forbid();
 
             var products = await service.GetAllProducts(orderId);
             List<ProductDto> result = mapper.Map<List<Product>, List<ProductDto>>(products);
@@ -64,6 +75,7 @@ namespace api.Controllers
 
         [HttpGet]
         [Route("api/Orders/{orderId}/[controller]s/{id}")]
+        [Authorize(Roles = Roles.Admin + "," + Roles.RegisteredUser)]
         public async Task<ActionResult<ProductDto>> GetProduct(int id, int orderId)
         {
             var order = await orderService.GetOrder(orderId);
@@ -73,20 +85,25 @@ namespace api.Controllers
             var product = await service.GetProduct(id, orderId);
             if (product == null)
                 return NotFound($"Produktas su Id {id} nerastas.");
+
+            var authorizationResult = await authorizationService.AuthorizeAsync(User, order, PolicyNames.ResourceOwner);
+            if (!authorizationResult.Succeeded)
+                return Forbid();
+
             var productDto = mapper.Map<Product, ProductDto>(product);
             return Ok(productDto);
         }
 
         [HttpPut]
         [Route("api/[controller]s/{id}")]
-        public async Task<ActionResult<ProductDto>> UpdateProduct(int id, ProductDto updatedProduct)
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<ActionResult<ProductDto>> UpdateProduct(int id, CreateProductDto updatedProduct)
         {           
             var product = await service.GetProduct(id);
             if (product == null)
                 return NotFound($"Produktas (Id={id}) nerastas.");
 
-
-            var productFromDto = mapper.Map<ProductDto, Product>(updatedProduct, product);
+            var productFromDto = mapper.Map<CreateProductDto, Product>(updatedProduct, product);
             try
             {
                 await service.UpdateProduct(id, productFromDto);
@@ -100,7 +117,8 @@ namespace api.Controllers
 
         [HttpPut]
         [Route("api/Orders/{orderId}/[controller]s/{id}")]
-        public async Task<ActionResult<ProductDto>> UpdateProduct(int id, ProductDto updatedProduct, int orderId, bool remove)
+        [Authorize(Roles = Roles.Admin + "," + Roles.RegisteredUser)]
+        public async Task<ActionResult<ProductDto>> UpdateProduct(int id, CreateProductDto updatedProduct, int orderId, bool remove)
         {
             if (remove)
                 _ = RemoveProductFromOrder(id, orderId);
@@ -109,9 +127,17 @@ namespace api.Controllers
             if (order == null)
                 return NotFound($"Užsakymas (Id={orderId}) nerastas.");
 
+            var authorizationResult = await authorizationService.AuthorizeAsync(User, order, PolicyNames.ResourceOwner);
+            if (!authorizationResult.Succeeded)
+                return Forbid();
+
             var product = await service.GetProduct(id);
             if (product == null)
                 return NotFound($"Produktas (Id={id}) nerastas.");
+
+            var authorizationResult2 = await authorizationService.AuthorizeAsync(User, product, PolicyNames.ResourceOwner);
+            if (!authorizationResult2.Succeeded)
+                return Forbid();
 
             if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
                 return BadRequest($"Negalima atnaujinti produkto prie užsakymo dėl statuso. Statusas - {order.Status}.");
@@ -122,7 +148,7 @@ namespace api.Controllers
             if (updatedProduct.Quantity <= 0)
                 return BadRequest($"Netinkamas produkto kiekis: {updatedProduct.Quantity}.");
 
-            var productFromDto = mapper.Map<ProductDto, Product>(updatedProduct, product);
+            var productFromDto = mapper.Map<CreateProductDto, Product>(updatedProduct, product);
             productFromDto.OrderId = orderId;
             product.CanBeBought = false;
             if (productFromDto.Price != product.Price || productFromDto.Quantity != product.Quantity)
@@ -144,9 +170,11 @@ namespace api.Controllers
 
         [HttpPost]
         [Route("api/[controller]s")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> CreateProduct(CreateProductDto newProduct)
         {
             var mapDtoToProduct = mapper.Map<CreateProductDto, Product>(newProduct);
+            mapDtoToProduct.CreatorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (mapDtoToProduct.CanBeBought && (mapDtoToProduct.Price == null || mapDtoToProduct.Price <= 0))
                 return BadRequest($"Kainos laukelis turi būti užpildytas arba prekė turi būti neparduodama.");
@@ -168,11 +196,16 @@ namespace api.Controllers
 
         [HttpPost]
         [Route("api/Orders/{orderId}/[controller]s")]
+        [Authorize(Roles = Roles.Admin + "," + Roles.RegisteredUser)]
         public async Task<IActionResult> CreateProduct(CreateProductDto newProduct, int orderId)
         {
             var order = await orderService.GetOrder(orderId);
             if (order == null)
                 return NotFound($"Užsakymas (Id={orderId}) nerastas.");
+
+            var authorizationResult = await authorizationService.AuthorizeAsync(User, order, PolicyNames.ResourceOwner);
+            if (!authorizationResult.Succeeded)
+                return Forbid();
 
             if (order.Status != OrderStatuses.Sukurtas && order.Status != OrderStatuses.Pateiktas)
                 return BadRequest($"Negalima sukurti produkto prie užsakymo dėl statuso. Statusas - {order.Status.ToString().ToLower()}.");
@@ -187,7 +220,7 @@ namespace api.Controllers
             mapDtoToProduct.OrderId = orderId;
             mapDtoToProduct.CanBeBought = false;
             mapDtoToProduct.IsDisplayed = false;
-            mapDtoToProduct.Creator = order.Orderer;
+            mapDtoToProduct.CreatorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             order.Subtotal += (decimal) mapDtoToProduct.Price * mapDtoToProduct.Quantity;
             order.DateEditted = DateTime.UtcNow;
             order.Total = order.Subtotal + 5;
@@ -204,6 +237,7 @@ namespace api.Controllers
 
         [HttpDelete]
         [Route("api/[controller]s/{id}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var product = await service.GetProduct(id);
@@ -226,11 +260,16 @@ namespace api.Controllers
 
         [HttpDelete]
         [Route("api/Orders/{orderId}/[controller]s/{id}")]
+        [Authorize(Roles = Roles.Admin + "," + Roles.RegisteredUser)]
         public async Task<IActionResult> DeleteProduct(int id, int orderId)
         {
             var order = await orderService.GetOrder(orderId);
             if (order == null)
                 return NotFound($"Užsakymas (Id={orderId}) nerastas.");
+
+            var authorizationResult = await authorizationService.AuthorizeAsync(User, order, PolicyNames.ResourceOwner);
+            if (!authorizationResult.Succeeded)
+                return Forbid();
 
             var product = await service.GetProduct(id);
             if (product == null)
@@ -254,7 +293,8 @@ namespace api.Controllers
         }
 
         [HttpPatch]
-        [Route("api/Orders/{orderId}/[controller]s/{id}")] 
+        [Route("api/Orders/{orderId}/[controller]s/{id}")]
+        [Authorize(Roles = Roles.Admin + "," + Roles.RegisteredUser)]
         public async Task<IActionResult> AddExistingProductToOrder(int id, int orderId)
         {
             var order = await orderService.GetOrder(orderId);
