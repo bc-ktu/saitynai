@@ -5,6 +5,7 @@ namespace api.DTOs
     // prideti ID
     public class ProductDto
     {
+        public int Id { get; set; }
         public decimal? Price { get; set; }
         public string Title { get; set; }
         public string Type { get; set; }
@@ -12,6 +13,7 @@ namespace api.DTOs
         public int Quantity { get; set; }
         public bool CanBeBought { get; set; }
         public bool IsDisplayed { get; set; }
+        public string CreatorId { get; set; }
 
     }
     public class CreateProductDto
@@ -22,7 +24,6 @@ namespace api.DTOs
         public string Description { get; set; }
         public int Quantity { get; set; }
         public bool CanBeBought { get; set; }
-        public string Creator { get; set; } 
         public bool IsDisplayed { get; set; }
 
     }

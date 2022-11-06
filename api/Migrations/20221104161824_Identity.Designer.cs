@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Data;
 
@@ -11,9 +12,10 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20221104161824_Identity")]
+    partial class Identity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,7 +123,10 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("AuthorId")
+                    b.Property<Guid?>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AuthorId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateCreated")
@@ -152,13 +157,9 @@ namespace api.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
+                    b.HasIndex("AuthorId1");
 
                     b.HasIndex("ProductId");
 
@@ -179,7 +180,10 @@ namespace api.Migrations
                     b.Property<DateTime?>("DateEditted")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("OrdererId")
+                    b.Property<Guid?>("OrdererId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OrdererId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Status")
@@ -191,13 +195,9 @@ namespace api.Migrations
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("OrdererId");
+                    b.HasIndex("OrdererId1");
 
                     b.ToTable("Orders");
                 });
@@ -213,7 +213,10 @@ namespace api.Migrations
                     b.Property<bool>("CanBeBought")
                         .HasColumnType("bit");
 
-                    b.Property<string>("CreatorId")
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatorId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
@@ -243,13 +246,9 @@ namespace api.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatorId");
+                    b.HasIndex("CreatorId1");
 
                     b.HasIndex("OrderId");
 
@@ -393,7 +392,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Data.Entities.RegisteredUser", "Author")
                         .WithMany()
-                        .HasForeignKey("AuthorId");
+                        .HasForeignKey("AuthorId1");
 
                     b.HasOne("api.Models.Product", "Product")
                         .WithMany("Comments")
@@ -410,7 +409,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Data.Entities.RegisteredUser", "Orderer")
                         .WithMany()
-                        .HasForeignKey("OrdererId");
+                        .HasForeignKey("OrdererId1");
 
                     b.Navigation("Orderer");
                 });
@@ -419,7 +418,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Data.Entities.RegisteredUser", "Creator")
                         .WithMany()
-                        .HasForeignKey("CreatorId");
+                        .HasForeignKey("CreatorId1");
 
                     b.HasOne("api.Entities.Order", "Order")
                         .WithMany("Products")

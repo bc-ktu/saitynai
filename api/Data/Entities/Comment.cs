@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using api.Authorization.Model;
+using api.Data.Entities;
 using api.Models;
 
 namespace api.Entities
 {
-    public class Comment
+    public class Comment : IUserOwnedResource
     {
         [Key]
         public int Id { get; set; }
@@ -27,7 +30,8 @@ namespace api.Entities
         public DateTime? DateEditted { get; set; }
         public bool IsFeatured { get; set; }
         public bool IsDeleted { get; set; }
-        public string Author { get; set; } // keisti į ID
+        public RegisteredUser? Author { get; set; } // keisti į ID
+        public string? AuthorId { get { return UserId; } set { UserId = value; } } // keisti į ID
         [JsonIgnore]
         public Product Product { get; set; }
         [JsonIgnore]
