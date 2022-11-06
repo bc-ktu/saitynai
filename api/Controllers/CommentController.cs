@@ -246,7 +246,7 @@ namespace api.Controllers
             mapDtoToComment.IsFeatured = true;
 
             try
-            {
+            { 
                 await service.CreateComment(mapDtoToComment);
             }
             catch (Exception ex)

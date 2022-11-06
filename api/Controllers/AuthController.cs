@@ -13,7 +13,6 @@ using System.Collections.Generic;
 namespace api.Controllers
 {
     [ApiController]
-    [Route("api")]
     public class AuthController : ControllerBase
     {
         private readonly UserManager<RegisteredUser> userManager;
@@ -32,7 +31,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("/Register")]
+        [Route("api/Register")]
         [AllowAnonymous]
         public async Task<IActionResult> Register (CreateUserDto registerUserDto) 
         {
@@ -62,7 +61,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("/Token")]
+        [Route("api/Token")]
         [AllowAnonymous]
         public async Task<ActionResult> Login(LoginUserDto loginDto)
         {
@@ -88,7 +87,7 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("/Users")]
+        [Route("api/Users")]
         [Authorize(Roles=Roles.Admin)]
         public async Task<ActionResult<List<UserDto>>> GetRegisteredUsers()
         {
@@ -97,6 +96,7 @@ namespace api.Controllers
         }
 
         [HttpPut]
+        [Route("api/UserUpdate")]
         [Authorize(Roles=Roles.Admin)]
         public async Task<ActionResult<UserDto>> UpdateUser(string email)
         {
@@ -119,7 +119,7 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Route("/PasswordReset")]
+        [Route("api/PasswordReset")]
         [AllowAnonymous]
         public async Task<ActionResult<UserDto>> ChangePassword(PasswordResetUserDto passwordResetUserDto)
         {

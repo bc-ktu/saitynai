@@ -11,6 +11,7 @@ using api.Data.Entities;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using api.Authorization.Model;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,7 +98,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint($"/swagger/v1/swagger.json", "APP API");
+        c.RoutePrefix = String.Empty;
+    });
 }
 
 app.UseHttpsRedirection();
