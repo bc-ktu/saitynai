@@ -126,13 +126,13 @@ namespace api.Controllers
             if (product == null)
                 return NotFound($"Produktas (Id={productId}) nerastas.");
 
-            var authorizationResult = await authorizationService.AuthorizeAsync(User, product, PolicyNames.ResourceOwner);
-            if (!authorizationResult.Succeeded)
-                return Forbid();
-
             var comment = await service.GetComment(productId, id);
             if (comment == null)
                 return NotFound($"Komentaras (Id={id}) nerastas.");
+
+            var authorizationResult = await authorizationService.AuthorizeAsync(User, comment, PolicyNames.ResourceOwner);
+            if (!authorizationResult.Succeeded)
+                return Forbid();
 
             if (comment.IsDeleted)
                 return BadRequest($"Komentaras (Id={id}) pažymėtas kaip ištrintas.");
@@ -198,7 +198,7 @@ namespace api.Controllers
 
         [HttpPost]
         [Route("api/Products/{productId}/[controller]s")]
-        [Authorize(Roles = Roles.RegisteredUser)]
+        [Authorize(Roles = Roles.Admin + "," + Roles.RegisteredUser)]
         public async Task<IActionResult> CreateComment(int productId, CreateCommentDto newComment)
         {
             var product = await productService.GetProduct(productId);
@@ -222,7 +222,7 @@ namespace api.Controllers
 
         [HttpPost]
         [Route("api/Orders/{orderId}/Products/{productId}/[controller]s")]
-        [Authorize(Roles = Roles.RegisteredUser)]
+        [Authorize(Roles = Roles.Admin + "," + Roles.RegisteredUser)]
         public async Task<IActionResult> CreateComment(int orderId, int productId, CreateCommentDto newComment)
         {
             var order = await orderService.GetOrder(orderId);
@@ -265,13 +265,14 @@ namespace api.Controllers
             if (product == null)
                 return NotFound($"Produktas (Id={productId}) nerastas.");
 
-            var authorizationResult = await authorizationService.AuthorizeAsync(User, product, PolicyNames.ResourceOwner);
-            if (!authorizationResult.Succeeded)
-                return Forbid();
-
             var comment = await service.GetComment(productId, id);
             if (comment == null)
                 return NotFound($"Komentaras (Id={id}) nerastas.");
+
+            var authorizationResult = await authorizationService.AuthorizeAsync(User, comment, PolicyNames.ResourceOwner);
+            if (!authorizationResult.Succeeded)
+                return Forbid();
+
             comment.IsDeleted = true;
             try
             {
