@@ -14,6 +14,7 @@ namespace api.Data.DTOs
     {
         public string AccessToken { get; set; }
         public string RefreshToken { get; set; }
+        public UserDto UserData { get; set; }
     }
 
     public class LoginUserDto
@@ -55,6 +56,5 @@ namespace api.Data.DTOs
         public string City { get; set; }
         public string ZipCode { get; set; }
         public string Address { get; set; }
-        public string PasswordHash { get; set; }
     }
 }

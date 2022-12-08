@@ -105,6 +105,10 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseCors(opt => {
+    opt.AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed(origin => true).AllowCredentials().WithOrigins("http://localhost:3000");
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -9,6 +9,11 @@ using PasswordGenerator;
 using SendGrid.Helpers.Mail;
 using SendGrid;
 using System.Collections.Generic;
+using api.Entities;
+using System.Security.Claims;
+using api.Authorization.Model;
+using EllipticCurve.Utils;
+using api.DTOs;
 
 namespace api.Controllers
 {
@@ -19,15 +24,17 @@ namespace api.Controllers
         private readonly IMapper mapper;
         private readonly IJwtTokenService tokenService;
         private readonly IConfiguration configuration;
+        private readonly IAuthorizationService authorizationService;
 
         private Password pswGenerator = new Password(includeLowercase: true, includeUppercase: true, includeNumeric: true, includeSpecial: true, passwordLength: 16);
 
-        public AuthController(UserManager<RegisteredUser> userManager, IMapper mapper, IJwtTokenService tokenService, IConfiguration configuration)
+        public AuthController(UserManager<RegisteredUser> userManager, IMapper mapper, IJwtTokenService tokenService, IConfiguration configuration, IAuthorizationService authorizationService)
         {
             this.userManager = userManager;
             this.mapper = mapper;
             this.tokenService = tokenService;
             this.configuration = configuration;
+            this.authorizationService = authorizationService;
         }
 
         [HttpPost]
@@ -81,6 +88,8 @@ namespace api.Controllers
 
             var succesfulLoginDto = new SuccessfulLoginResponseDto();
             succesfulLoginDto.AccessToken = accessToken;
+            var userData = mapper.Map<RegisteredUser, UserDto>(user);
+            succesfulLoginDto.UserData = userData;
           //  succesfulLoginDto.RefreshToken = refreshToken;
 
             return Ok(succesfulLoginDto);
@@ -145,6 +154,34 @@ namespace api.Controllers
             user.HasFinishedRegistration = true;
 
             return Ok(mapper.Map<RegisteredUser, UserDto>(user));
+        }
+
+
+        [HttpPut]
+        [Route("api/Profile")]
+        [Authorize(Roles = Roles.Admin + "," + Roles.RegisteredUser)]
+        public async Task<ActionResult<UserDto>> UpdateProfile(UpdateUserDto userDto)
+        {
+            var email = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            /*var authorizationResult = await authorizationService.AuthorizeAsync(User, userDto.Email, PolicyNames.ResourceOwner);
+            if (!authorizationResult.Succeeded)
+                return Forbid();*/
+
+            var user = await userManager.FindByEmailAsync(userDto.Email);
+            if (user == null)
+                return NotFound("Nerastas vartotojas.");
+
+            user.FirstName = userDto.FirstName;
+            user.LastName = userDto.LastName;
+            user.PhoneNumber = userDto.PhoneNumber;
+            user.Address = userDto.Address;
+            user.ZipCode = userDto.ZipCode;
+            user.City = userDto.City;
+
+            await userManager.UpdateAsync(user);
+            
+            return Ok(user);
         }
 
         private async Task Execute(RegisteredUser user, string psw)
