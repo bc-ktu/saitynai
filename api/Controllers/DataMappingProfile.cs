@@ -17,6 +17,7 @@ namespace api.Controllers
             CreateMap<CreateProductDto, Product>();
 
             CreateMap<Comment, CommentDto>();
+            CreateMap<Comment, CommentWithAuthorDto>();
             CreateMap<CommentDto, Comment>();
             CreateMap<CreateCommentDto, Comment>();
             CreateMap<UpdateCommentDto, Comment>();

@@ -28,12 +28,12 @@ namespace api.Data.Services
 
         public async Task<List<Comment>> GetAllComments(int productId)
         {
-            return await context.Comments.Where(c => c.ProductId == productId).ToListAsync();
+            return await context.Comments.Include(x => x.Author).Where(c => c.ProductId == productId).ToListAsync();
         }
 
         public async Task<Comment?> GetComment(int productId, int commentId)
         {
-            return await context.Comments.Where(p => p.Id == commentId && p.ProductId == productId).FirstOrDefaultAsync();
+            return await context.Comments.Include(x => x.Author).Where(p => p.Id == commentId && p.ProductId == productId).FirstOrDefaultAsync();
         }
 
         public async Task CreateComment(Comment newComment)

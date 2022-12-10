@@ -1,5 +1,6 @@
 ﻿using api.Authorization.Model;
 using api.Data;
+using api.Data.DTOs;
 using api.Data.Entities;
 using api.Data.Services;
 using api.DTOs;
@@ -9,6 +10,7 @@ using AutoMapper;
 using AutoMapper.Configuration.Conventions;
 using EllipticCurve.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -18,14 +20,16 @@ namespace api.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
+        private readonly UserManager<RegisteredUser> userManager;
         private readonly ICommentService service;
         private readonly IProductService productService;
         private readonly IOrderService orderService;
         private readonly IMapper mapper;
         private readonly IAuthorizationService authorizationService;
 
-        public CommentController(ICommentService service, IProductService productService, IOrderService orderService, IMapper mapper, IAuthorizationService authorizationService)
+        public CommentController(UserManager<RegisteredUser> userManager, ICommentService service, IProductService productService, IOrderService orderService, IMapper mapper, IAuthorizationService authorizationService)
         {
+            this.userManager = userManager;
             this.service = service;
             this.productService = productService;
             this.mapper = mapper;
@@ -46,7 +50,12 @@ namespace api.Controllers
             if (comments.Count == 0)
                 return NotFound(string.Format($"Produktas (Id={productId}) komentarų neturi."));
 
-            List<CommentDto> result = mapper.Map<List<Comment>, List<CommentDto>>(comments);
+            List<CommentWithAuthorDto> result = mapper.Map<List<Comment>, List<CommentWithAuthorDto>>(comments);
+            for (int i = 0; i < result.Count; i++)
+            {
+                result[i].AuthorFirstName = comments[i].Author.FirstName;
+                result[i].AuthorLastName = comments[i].Author.LastName;
+            }
             return Ok(result);
         }
 
@@ -71,7 +80,12 @@ namespace api.Controllers
             if (comments.Count == 0)
                 return NotFound(string.Format($"Produktas (Id={productId}) komentarų neturi."));
 
-            List<CommentDto> result = mapper.Map<List<Comment>, List<CommentDto>>(comments);
+            List<CommentWithAuthorDto> result = mapper.Map<List<Comment>, List<CommentWithAuthorDto>>(comments);
+            for (int i = 0; i < result.Count; i++)
+            {
+                result[i].AuthorFirstName = comments[i].Author.FirstName;
+                result[i].AuthorLastName = comments[i].Author.LastName;
+            }
             return Ok(result);
         }
 
@@ -88,8 +102,11 @@ namespace api.Controllers
             if (comment == null)
                 return NotFound($"Produktas (Id={productId}) komentaro (Id={id}) neturi.");
 
-            var CommentDto = mapper.Map<Comment, CommentDto>(comment);
-            return Ok(CommentDto);
+           /* var CommentDto = mapper.Map<Comment, CommentDto>(comment);*/
+            var mapCommentToDto = mapper.Map<Comment, CommentWithAuthorDto>(comment);
+            mapCommentToDto.AuthorFirstName = comment.Author.FirstName;
+            mapCommentToDto.AuthorLastName = comment.Author.LastName;
+            return Ok(mapCommentToDto);
         }
 
         [HttpGet]
@@ -113,8 +130,10 @@ namespace api.Controllers
             if (comment == null)
                 return NotFound($"Produktas (Id={productId}) komentaro (Id={id}) neturi.");
 
-            var CommentDto = mapper.Map<Comment, CommentDto>(comment);
-            return Ok(CommentDto);
+            var mapCommentToDto = mapper.Map<Comment, CommentWithAuthorDto>(comment);
+            mapCommentToDto.AuthorFirstName = comment.Author.FirstName;
+            mapCommentToDto.AuthorLastName = comment.Author.LastName;
+            return Ok(mapCommentToDto);
         }
 
         [HttpPut]
@@ -149,7 +168,10 @@ namespace api.Controllers
             {
                 return BadRequest($"Nepavyko atnaujinti komentaro. Klaida: {ex.Message}");
             }
-            return StatusCode(204);
+            var mapCommentToDto = mapper.Map<Comment, CommentWithAuthorDto>(commentFromDto);
+            mapCommentToDto.AuthorFirstName = comment.Author.FirstName;
+            mapCommentToDto.AuthorLastName = comment.Author.LastName;
+            return StatusCode(204, mapCommentToDto);
         }
 
         [HttpPut]
@@ -193,7 +215,10 @@ namespace api.Controllers
             {
                 return BadRequest($"Nepavyko atnaujinti komentaro. Klaida: {ex.Message}");
             }
-            return StatusCode(204);
+            var mapCommentToDto = mapper.Map<Comment, CommentWithAuthorDto>(commentFromDto);
+            mapCommentToDto.AuthorFirstName = comment.Author.FirstName;
+            mapCommentToDto.AuthorLastName = comment.Author.LastName;
+            return StatusCode(204, mapCommentToDto);
         }
 
         [HttpPost]
@@ -209,6 +234,8 @@ namespace api.Controllers
             mapDtoToComment.Product = product;
             mapDtoToComment.DateCreated = DateTime.UtcNow;
             mapDtoToComment.AuthorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var user = await userManager.FindByIdAsync(mapDtoToComment.AuthorId);
             try
             {
                 await service.CreateComment(mapDtoToComment);
@@ -217,7 +244,11 @@ namespace api.Controllers
             {
                 return BadRequest($"Nepavyko sukurti komentaro. Klaida: {ex.Message}");
             }
-            return StatusCode(201);
+            var mapCommentToDto = mapper.Map<Comment, CommentWithAuthorDto>(mapDtoToComment);
+            
+            mapCommentToDto.AuthorFirstName = user.FirstName;
+            mapCommentToDto.AuthorLastName = user.LastName;
+            return StatusCode(201, mapCommentToDto);
         }
 
         [HttpPost]
@@ -244,6 +275,8 @@ namespace api.Controllers
             mapDtoToComment.Product = product;
             mapDtoToComment.DateCreated = DateTime.UtcNow;
             mapDtoToComment.IsFeatured = true;
+            mapDtoToComment.AuthorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await userManager.FindByIdAsync(mapDtoToComment.AuthorId);
 
             try
             { 
@@ -253,7 +286,10 @@ namespace api.Controllers
             {
                 return BadRequest($"Nepavyko sukurti komentaro. Klaida: {ex.Message}");
             }
-            return StatusCode(201);
+            var mapCommentToDto = mapper.Map<Comment, CommentWithAuthorDto>(mapDtoToComment);
+            mapCommentToDto.AuthorFirstName = user.FirstName;
+            mapCommentToDto.AuthorLastName = user.LastName;
+            return StatusCode(201, mapCommentToDto);
         }
 
         [HttpDelete]
