@@ -35,3 +35,19 @@ Užsakymas <- Produktas <- Komentaras
 **Pasirinktos technologijos:**
 - Frontend dalis: React
 - Backend dalis: .NET 6 + SQL Server
+
+**API specifikacija**
+
+- Gauti užsakymus
+
+| API metodas        | GET           |
+| Kelias iki metodo  | /orders |
+| Vartotojai, galintys pasiekti  | Admin |
+| Paskirtis    | Gauti visus užsakymus      |
+| Užklausos "Header" dalis | „Authorization“:“ Bearer {access_token}" |
+| Užklausos struktūra | -     |
+| Atsakymo struktūra | -     |
+| Atsakymo kodas | -     |
+| Galimi klaidų kodai | -     |
+| Užklausos pavyzdys | https://knygastoreapi.azurewebsites.net/api/Orders |
+| Gauto atsakymo pavyzdys | -     |
