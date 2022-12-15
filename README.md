@@ -40,6 +40,7 @@ Užsakymas <- Produktas <- Komentaras
 
 - Gauti užsakymus
 
+| ------------- |:-------------:| -----:|
 | API metodas        | GET           |
 | Kelias iki metodo  | /orders |
 | Vartotojai, galintys pasiekti  | Admin |
