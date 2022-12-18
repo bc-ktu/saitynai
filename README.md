@@ -978,3 +978,31 @@ Užsakymas <- Produktas <- Komentaras
 <tr> <td> Gauto atsakymo pavyzdys </td> <td> - </td></tr>
 </table>
 
+
+
+Wireframes/Svetainė
+
+- /orders
+
+Wireframe:
+![image](https://user-images.githubusercontent.com/113304150/208324572-305d3216-f37e-4d36-b5bc-63d939c54fc0.png)
+
+Actual:
+![image](https://user-images.githubusercontent.com/113304150/208324695-130fbd89-4167-40ce-a3d0-5f4c230e2836.png)
+
+- /products
+
+Wireframe:
+![image](https://user-images.githubusercontent.com/113304150/208324763-d4c37a85-8df0-40b6-aa4c-a7b737d6608e.png)
+
+Actual:
+![image](https://user-images.githubusercontent.com/113304150/208324734-e87e18e3-4950-4d87-807b-a305afd3a5f9.png)
+
+- /product?id={id}
+
+Wireframe:
+![image](https://user-images.githubusercontent.com/113304150/208324841-487cc855-b8a6-45ce-afff-c0427fada2fe.png)
+
+Actual:
+![image](https://user-images.githubusercontent.com/113304150/208324891-308363ef-42e5-48e3-81c7-22b6998de200.png)
+
