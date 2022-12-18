@@ -44,7 +44,7 @@ Užsakymas <- Produktas <- Komentaras
 
 <tr> <td> <b> Gauti užsakymus </b> </td> <td> </td></tr> 
 <tr> <td> API metodas </td> <td> GET </td></tr>  
-<tr> <td> Kelias iki metodo </td> <td> /Orders </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Orders </td></tr>  
 <tr> <td> Vartotojai, galintys pasiekti </td> <td> Admin </td></tr>  
 <tr> <td> Paskirtis </td> <td> Gauti visus užsakymus  </td></tr>  
 <tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
@@ -53,21 +53,13 @@ Užsakymas <- Produktas <- Komentaras
 
 ```json
 [
-  {
-    "id": ...,
-    "status": ...,
-    "dateCreated": ...,
-    "dateEditted": ...,
-    "total": ...,
-    "subtotal": ...
-  },
-  {
-    "id": ...,
-    "status": ...,
-    "dateCreated": ...,
-    "dateEditted": ...,
-    "total": ...,
-    "subtotal": ...
+ {
+    "id": 0,
+    "status": 0,
+    "dateCreated": "2022-12-18T14:03:11.310Z",
+    "dateEditted": "2022-12-18T14:03:11.310Z",
+    "total": 0,
+    "subtotal": 0
   }
 ]
 ```
@@ -105,7 +97,7 @@ Užsakymas <- Produktas <- Komentaras
 <table>
 <tr> <td> <b> Gauti užsakymą </b> </td> <td> </td></tr> 
 <tr> <td> API metodas </td> <td> GET </td></tr>  
-<tr> <td> Kelias iki metodo </td> <td> /Orders/{id} </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Orders/{id} </td></tr>  
 <tr> <td> Vartotojai, galintys pasiekti </td> <td> Admin, prisijungęs </td></tr>  
 <tr> <td> Paskirtis </td> <td> Gauti konkretų užsakymą  </td></tr>  
 <tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
@@ -114,13 +106,13 @@ Užsakymas <- Produktas <- Komentaras
 
 ``` json
 {
-  "id": ...,
-  "status": ...,
-  "dateCreated": ..,
-  "dateEditted": ...,
-  "total": ...,
-  "subtotal": ...
-}  
+  "id": 0,
+  "status": 0,
+  "dateCreated": "2022-12-18T14:03:34.658Z",
+  "dateEditted": "2022-12-18T14:03:34.658Z",
+  "total": 0,
+  "subtotal": 0
+} 
 ```
 
 </td></tr>  
@@ -142,3 +134,59 @@ Užsakymas <- Produktas <- Komentaras
 
 </td></tr>
 </table>
+
+
+<table>
+<tr> <td> <b> Sukurti užsakymą </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> POST </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Orders </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Admin, prisijungęs</td></tr>  
+<tr> <td> Paskirtis </td> <td> Sukurti naują užsakymą  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 201 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 401 - neautorizuotas </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Orders </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> - </td></tr>
+</table>
+
+<table>
+<tr> <td> <b> Redaguoti užsakymą </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> PUT </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Orders/{id} </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Admin, prisijungęs</td></tr>  
+<tr> <td> Paskirtis </td> <td> Redaguoti užsakymą  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> 
+
+```json
+{
+  "status": 0
+}
+```
+
+</td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 204 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 401 - neautorizuotas, 404 - nerastas </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Orders/5 </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> - </td></tr>
+</table>
+
+
+<table>
+<tr> <td> <b> Ištrinti užsakymą </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> DELETE </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Orders/{id} </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Admin, prisijungęs </td></tr>  
+<tr> <td> Paskirtis </td> <td> Ištrinti užsakymą  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 200 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 401 - neautorizuotas, 403 - uždrausta, 404 - nerastas </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Orders/4 </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> - </td></tr>
+</table>
+
