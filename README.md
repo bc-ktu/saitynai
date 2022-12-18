@@ -597,3 +597,384 @@ Užsakymas <- Produktas <- Komentaras
 <tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Orders/1/Products/1 </td></tr> 
 <tr> <td> Gauto atsakymo pavyzdys </td> <td> - </td></tr>
 </table>
+
+- Komentarų CRUD
+
+
+<table>
+<tr> <td> <b> Gauti produkto komentarus </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> GET </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Products/{productId}/Comments </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Visi </td></tr>  
+<tr> <td> Paskirtis </td> <td> Gauti visus produkto komentarus  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> - </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> 
+
+```json
+[
+	{
+	  "title": "string",
+	  "text": "string",
+	  "isFeatured": true
+	},
+	{
+	  "title": "string",
+	  "text": "string",
+	  "isFeatured": true
+	}
+]
+```
+
+</td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 200 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 404 - nerasta </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/Products/1/Comments</td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> 
+
+```json
+[
+  {
+    "dateCreated": "2022-11-22T21:41:00.1022211",
+    "title": "string",
+    "text": "string",
+    "isFeatured": true,
+    "isDeleted": false,
+    "authorId": "01aecccc-5d4f-4f06-b7b1-5631b647153a",
+    "id": 4
+  },
+  {
+    "dateCreated": "2022-12-02T18:32:43.5838208",
+    "title": "test",
+    "text": "tesdt",
+    "isFeatured": false,
+    "isDeleted": false,
+    "authorId": "01aecccc-5d4f-4f06-b7b1-5631b647153a",
+    "id": 5
+  }
+] 
+```
+
+</td></tr>
+</table>
+
+<table>
+<tr> <td> <b> Gauti produkto komentarą </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> GET </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Products/{productId}/Comments/{id} </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Visi </td></tr>  
+<tr> <td> Paskirtis </td> <td> Gauti produkto komentarą  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> - </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> 
+
+```json
+{
+  "dateCreated": "2022-12-18T20:22:14.354Z",
+  "title": "string",
+  "text": "string",
+  "isFeatured": true,
+  "isDeleted": true,
+  "authorId": "string",
+  "id": 0
+}
+```
+
+</td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 200 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 404 - nerastas </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Products/1/Comments/2 </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> 
+
+```json
+{
+  "dateCreated": "2022-11-22T21:41:00.1022211",
+  "title": "string",
+  "text": "string",
+  "isFeatured": true,
+  "isDeleted": false,
+  "authorId": "01aecccc-5d4f-4f06-b7b1-5631b647153a",
+  "id": 4
+}
+
+```
+
+</td></tr>
+</table>
+
+<table>
+<tr> <td> <b> Sukurti produkto komentarą </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> POST </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Products/{productId}/Comments </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Admin, prisijungęs vartotojas </td></tr>  
+<tr> <td> Paskirtis </td> <td> Sukurti produkto komentarą  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> 
+
+```json
+{
+  "title": "string",
+  "text": "string",
+  "isFeatured": true
+}
+```
+
+</td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 201 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 401 - neautorizuotas, 400 - bloga užklausa </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Products/1/Comments </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> - </td></tr>
+</table>
+
+<table>
+<tr> <td> <b> Redaguoti produkto komentarą </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> PUT </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Products/{productId}/Comments/{id} </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Prisijungęs vartotojas  </td></tr>  
+<tr> <td> Paskirtis </td> <td> Redaguoti produkto komentarą  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> 
+
+```json
+{
+  "title": "string",
+  "text": "string",
+  "isFeatured": false
+}
+```
+
+ </td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> 
+
+```json
+{
+  "dateCreated": "2022-12-18T20:27:32.428Z",
+  "title": "string",
+  "text": "string",
+  "isFeatured": true,
+  "isDeleted": true,
+  "authorId": "string",
+  "id": 0
+}
+```
+
+</td> </tr> 
+<tr> <td> Atsakymo kodas</td> <td> 204 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 401 - neautorizuotas, 404 - nerastas, 403 - uždraustas, 400 - bloga užklausa </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Products/1/Comments/2 </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> 
+
+```json
+{
+  "dateCreated": "2022-12-18T20:27:32.428Z",
+  "title": "test",
+  "text": "string",
+  "isFeatured": false,
+  "isDeleted": false,
+  "authorId": "01aecccc-5d4f-4f06-b7b1-5631b647153a",
+  "id": 5
+}
+```
+
+</td></tr>
+</table>
+
+<table>
+<tr> <td> <b> Ištrinti produkto komentarą </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> DELETE </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Products/{productId}/Comments/{id} </td></tr>  
+<tr> <td> Vartotojai, galintys Ištrinti produktą </td> <td> Prisijungęs vartotojas </td></tr>  
+<tr> <td> Paskirtis </td> <td> Pašalinti produkto komentarą  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 204 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 401 - neautorizuotas, 404 - nerastas, 400 - bloga užklausa </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Products/1/Comments/2  </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> - </td></tr>
+</table>
+
+<table>
+<tr> <td> <b> Gauti užsakymo produkto komentarus </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> GET </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Orders/{orderId}/Product/{productId}/Comments </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Admin, prisijungęs vartotojas </td></tr>  
+<tr> <td> Paskirtis </td> <td> Gauti visus užsakymo produkto komentarus  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> 
+
+```json
+[
+  {
+    "dateCreated": "2022-12-18T20:36:22.662Z",
+    "title": "string",
+    "text": "string",
+    "isFeatured": true,
+    "isDeleted": true,
+    "authorId": "string",
+    "id": 0
+  }
+]
+```
+
+</td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 200 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 401 - neautorizuotas, 404 - nerastas </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Orders/3/Products/1/Comments </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> 
+
+```json
+[
+  {
+    "dateCreated": "2022-12-18T20:42:37.028Z",
+    "title": "test",
+    "text": "string",
+    "isFeatured": true,
+    "isDeleted": true,
+    "authorId": "01aecccc-5d4f-4f06-b7b1-5631b647153a",
+    "id": 105
+  }
+]
+```
+
+</td></tr>
+</table>
+
+<table>
+<tr> <td> <b> Gauti užsakymo produkto komentarą </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> GET </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Orders/{orderId}/Product/{productId}/Comments </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Admin, prisijungęs naudotojas </td></tr>  
+<tr> <td> Paskirtis </td> <td> Gauti komentarą produkto, kuris yra pridėtas prie užsakymo  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> 
+
+```json
+  {
+    "dateCreated": "2022-12-18T20:36:22.662Z",
+    "title": "string",
+    "text": "string",
+    "isFeatured": true,
+    "isDeleted": true,
+    "authorId": "string",
+    "id": 0
+  }
+```
+
+</td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 200 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 401 - neautorizuotas, 404 - nerastas </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Orders/1/Products/1/Comments/2   </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> 
+
+```json
+  {
+    "dateCreated": "2022-12-18T20:42:37.028Z",
+    "title": "test",
+    "text": "string",
+    "isFeatured": true,
+    "isDeleted": true,
+    "authorId": "01aecccc-5d4f-4f06-b7b1-5631b647153a",
+    "id": 105
+  }
+```
+
+</td></tr>
+</table>
+
+<table>
+<tr> <td> <b> Sukurti užsakymo produkto komentarą </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> POST </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Orders/{orderId}/Product/{productId}/Comments </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Admin, prisijungęs naudotojas  </td></tr>  
+<tr> <td> Paskirtis </td> <td> Sukurti užsakymo produkto komentarą  </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td>
+
+```json
+{
+  "title": "string",
+  "text": "string",
+  "isFeatured": true
+}
+```
+
+</td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 201 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 401 - neautorizuotas, 404 - nerastas, 400 - bloga užklausa </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Orders/1/Products/1/Comments </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> - </td></tr>
+</table>
+
+<table>
+<tr> <td> <b> Redaguoti užsakymo produkto komentarą </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> PUT </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Orders/{orderId}/Product/{productId}/Comments/{id} </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Prisijungęs naudotojas  </td></tr>  
+<tr> <td> Paskirtis </td> <td> Redaguoti produkto komentarą, kuris pridėtas prie užsakymo </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> 
+
+```json
+{
+  "title": "string",
+  "text": "string",
+  "isFeatured": true
+}
+``` 
+
+</td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> 
+
+```json
+{
+  "dateCreated": "2022-12-18T20:46:46.372Z",
+  "title": "string",
+  "text": "string",
+  "isFeatured": true,
+  "isDeleted": true,
+  "authorId": "string",
+  "id": 0
+}
+```
+
+</td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 204 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 401 - neautorizuotas, 404 - nerastas, 400 - bloga užklausa  </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Orders/1/Products/1/Comments/2  </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> 
+
+```json
+  {
+    "dateCreated": "2022-12-18T20:42:37.028Z",
+    "title": "test",
+    "text": "string",
+    "isFeatured": true,
+    "isDeleted": true,
+    "authorId": "01aecccc-5d4f-4f06-b7b1-5631b647153a",
+    "id": 105
+  }
+```
+
+</td></tr>
+</table>
+
+<table>
+<tr> <td> <b> Ištrinti užsakymo produkto komentarą  </b> </td> <td> </td></tr> 
+<tr> <td> API metodas </td> <td> DELETE </td></tr>  
+<tr> <td> Kelias iki metodo </td> <td> /api/Orders/{orderId}/Product/{productId}/Comments/{id} </td></tr>  
+<tr> <td> Vartotojai, galintys pasiekti </td> <td> Prisijungęs naudotojas  </td></tr>  
+<tr> <td> Paskirtis </td> <td> Ištrinti produkto komentarą, kuris yra pridėtas prie užsakymo (soft delete) </td></tr>  
+<tr> <td> Užklausos "Header" dalis </td> <td> „Authorization“:“ Bearer {access_token}" </td></tr> 
+<tr> <td> Užklausos struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo struktūra </td> <td> - </td></tr>  
+<tr> <td> Atsakymo kodas</td> <td> 204 (OK) </td></tr> 
+<tr> <td> Galimi klaidų kodai </td> <td> 403 - neautorizuotas, 404 - nerastas, 400 - neteisinga užklausa </td></tr> 
+<tr> <td> Užklausos pavyzdys </td> <td> https://knygastoreapi.azurewebsites.net/api/Orders/1/Products/1/Comments </td></tr> 
+<tr> <td> Gauto atsakymo pavyzdys </td> <td> - </td></tr>
+</table>
+
